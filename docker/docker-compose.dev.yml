@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16.1
+    container_name: RizPostgres
+    ports:
+      - 5432:5432
+    env_file:
+      - ../app/.env.db
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+
+volumes:
+  db_volume:
