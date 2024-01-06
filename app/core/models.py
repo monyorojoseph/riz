@@ -73,6 +73,33 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
+class TokenBase(models.Model):
+    token = models.CharField(unique=True, max_length=8)
+    createdOn = models.DateTimeField(auto_now_add=True)
+    validFrom = models.DateTimeField(default=timezone.now)
+    validTill = models.DateTimeField(default=timezone.now)
+    valid = models.BooleanField(default=True)
+
+    class Meta:
+        abstract = True
+
+class UserAuthToken(TokenBase):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    
+    LOGIN = 'LN'
+    REGISTER = 'RR'
+
+    CHOICES = [
+        (LOGIN, "User Login"),
+        (REGISTER, "User Registration")
+    ]
+    type = models.CharField(default=LOGIN, choices=CHOICES, max_length=5)
+
+    @property
+    def is_valid(self):
+        now = timezone.now()
+        return self.valid and (self.validFrom < now and self.validTill > now)
+
 class ShopMembership(models.Model):
     user = models.ForeignKey('User', related_name='shops', on_delete=models.CASCADE)
     shop = models.ForeignKey('Shop', related_name='staff', on_delete=models.CASCADE)
