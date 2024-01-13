@@ -10,3 +10,12 @@ def email_auth_token(token):
         [token.user.email],
         fail_silently=False,
     )
+
+def email_shop_membership_join_toke(token, email_to):
+    send_mail(
+        f"{token.shop.name} join token",
+        f"{token.shop.name} join token is {token.token} user it before {token.validTill}",
+        settings.EMAIL_HOST_USER,
+        [email_to],
+        fail_silently=False,
+    )

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'ninja_jwt',
     'ninja_jwt.token_blacklist',
     'huey.contrib.djhuey', 
+    "django_lifecycle_checks",
     'core'
 ]
 
@@ -178,7 +179,8 @@ NINJA_JWT = {
 
     # For Controller Schemas
     # FOR OBTAIN PAIR
-    'TOKEN_OBTAIN_PAIR_INPUT_SCHEMA': 'core.jwt_tokens.MyTokenObtainPairInputSchema',    # token pair custom schema
+    'TOKEN_OBTAIN_PAIR_INPUT_SCHEMA': "ninja_jwt.schema.TokenObtainPairInputSchema",
+    # 'TOKEN_OBTAIN_PAIR_INPUT_SCHEMA': 'core.jwt_tokens.MyTokenObtainPairInputSchema',    # token pair custom schema
     'TOKEN_OBTAIN_PAIR_REFRESH_INPUT_SCHEMA': "ninja_jwt.schema.TokenRefreshInputSchema",
     # FOR SLIDING TOKEN
     'TOKEN_OBTAIN_SLIDING_INPUT_SCHEMA': "ninja_jwt.schema.TokenObtainSlidingInputSchema",

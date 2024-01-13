@@ -5,6 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxLengthValidator
+from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE
+from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
@@ -83,8 +85,14 @@ class TokenBase(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def is_valid(self):
+        now = timezone.now()
+        return self.valid and (self.validFrom < now and self.validTill > now)
+
+
 class UserAuthToken(TokenBase):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='auth_tokens')
     
     LOGIN = 'LN'
     REGISTER = 'RR'
@@ -95,25 +103,29 @@ class UserAuthToken(TokenBase):
     ]
     type = models.CharField(default=LOGIN, choices=CHOICES, max_length=5)
 
-    @property
-    def is_valid(self):
-        now = timezone.now()
-        return self.valid and (self.validFrom < now and self.validTill > now)
+class ShopMembershipRole(models.TextChoices):
+    OWNER = "OR", _("Owner")
+    ADMIN = "AN", _("Admin")
 
+class ShopMembershipToken(LifecycleModelMixin, TokenBase):
+    user = models.ForeignKey('User', related_name='tokens', on_delete=models.SET_NULL, null=True, blank=True)
+    shop = models.ForeignKey('Shop', related_name='tokens', on_delete=models.CASCADE)    
+    role = models.CharField(default=ShopMembershipRole.ADMIN, choices=ShopMembershipRole.choices, max_length=5)
+    createdBy = models.ForeignKey('User', related_name='created_tokens',  on_delete=models.SET_NULL, null=True, blank=True)
+
+    @hook(AFTER_UPDATE, when='user', has_changed=True)
+    def token_used(self):
+        self.valid = False
+        self.save()
+    
 class ShopMembership(models.Model):
     user = models.ForeignKey('User', related_name='shops', on_delete=models.CASCADE)
     shop = models.ForeignKey('Shop', related_name='staff', on_delete=models.CASCADE)
-
-    OWNER = "OR"
-    ADMIN = "AN"
-
-    ROLE_CHOICES = [
-        (OWNER, "Shop Owner"),
-        (ADMIN, "Shop Admin")
-    ]
-
-    role = models.CharField(default=OWNER, choices=ROLE_CHOICES, max_length=5)
+    role = models.CharField(default=ShopMembershipRole.OWNER, choices=ShopMembershipRole.choices, max_length=5)
     joinedOn = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'shop']
 
 class Shop(models.Model):
     name = models.CharField(max_length=100)
@@ -121,37 +133,42 @@ class Shop(models.Model):
     url = models.URLField(blank=True, null=True)
     coverImage = models.ImageField(null=True, blank=True, upload_to='shop_cover_imgs')
     createdOn = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, max_length=100)
+    slug = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
 
     def __str__(self) -> str:
         return self.name
+    
+class ItemTypes(models.TextChoices):
+    BICYCLE = 'BCE', _("Bicycle")
+    DIRTY_BIKE = 'DB', _("Dirty Bike")
+    MOTOR_CYCLE = 'MC', _("Motor Cycle")
+    SALOON_CAR = 'SC', _("Car")
+    HATCH_BACK = 'HB', _("Hatch back")
+    CONVERTIBLE = 'CTE', _("Convertible")
+    COUPE_CAR = 'CC', _("Coupe")
+    SPORTS_CAR = 'SSC', _("Sorts Car")
+    SUV = 'SUV', _("SUV")
+    PICK_UP_TRUCK = 'PP', _("Pick up")
+    DOUBLE_CAB_TRUCK = 'DCT', _("Double Cab Truck")
+    LORRY = 'LY', _("Lorry")
+    TRACTOR = 'TR', _("Tractor")
 
 class Item(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     modelName = models.CharField(max_length=200)
     brandName = models.CharField(max_length=200)
     yom = models.CharField(max_length=6, null=True)
+    
     lender = models.ForeignKey('User', related_name='items', on_delete=models.SET_NULL, null=True, blank=True)
     shop = models.ForeignKey('Shop', related_name='items', on_delete=models.SET_NULL, null=True, blank=True)
 
     detailsObject = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     detailsObjectId = models.PositiveIntegerField(null=True)
-    detals = GenericForeignKey("detailsObject", "detailsObjectId")
+    details = GenericForeignKey("detailsObject", "detailsObjectId")
+
     createdOn = models.DateTimeField(auto_now_add=True)
 
-    MOTOR_CYCLE = 'MC'
-    VEHICLE = 'VE'
-    LORRY = 'LY'
-    TRACTOR = 'TR'
-
-    TYPE_CHOICES = [
-        (MOTOR_CYCLE, "Motor cycle"),
-        (VEHICLE, "Just a regular vehicle sized car, suv, van etc"),
-        (LORRY, "Big vehicle"),
-        (TRACTOR, "Tractor")
-    ]
-
-    type = models.CharField(default=VEHICLE, choices=TYPE_CHOICES, max_length=3)
+    type = models.CharField(default=ItemTypes.SALOON_CAR, choices=ItemTypes.choices, max_length=3)
 
     def __str__(self) -> str:
         return f"{self.brandName} {self.modelName}" 
@@ -159,15 +176,15 @@ class Item(models.Model):
 class Pricing(models.Model):
     item = models.OneToOneField('Item', related_name='prices', on_delete=models.CASCADE)
 
-    SHORT_TERM = 'SM'
-    LONG_TERM = 'LM'
+    RENT = 'RT'
+    LEASE = 'LE'
 
     TYPE_CHOICES = [
-        (SHORT_TERM, "Leasing for a few days"),
-        (LONG_TERM, "Leasing for more than a year")
+        (RENT, "Renting for a few days"),
+        (LEASE, "Leasing for a long period")
     ]
 
-    type = models.CharField(default=SHORT_TERM, choices=TYPE_CHOICES, max_length=5)
+    type = models.CharField(default=RENT, choices=TYPE_CHOICES, max_length=5)
 
     HOUR = 'HR'
     DAY = 'DY'
