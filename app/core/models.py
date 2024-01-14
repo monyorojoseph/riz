@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxLengthValidator
-from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE
+from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, AFTER_CREATE
 from django.utils.translation import gettext_lazy as _
 
 
@@ -127,16 +127,22 @@ class ShopMembership(models.Model):
     class Meta:
         unique_together = ['user', 'shop']
 
-class Shop(models.Model):
+class Shop(LifecycleModelMixin, models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     located = models.CharField(max_length=100)
     url = models.URLField(blank=True, null=True)
     coverImage = models.ImageField(null=True, blank=True, upload_to='shop_cover_imgs')
     createdOn = models.DateTimeField(auto_now_add=True)
-    slug = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
 
     def __str__(self) -> str:
         return self.name
+
+    @hook(AFTER_CREATE, on_commit=True)
+    def after_create_actions(self):
+        # create shop wallet
+        wallet = Wallet.objects.create(shop=self, balance=0)
+
     
 class ItemTypes(models.TextChoices):
     BICYCLE = 'BCE', _("Bicycle")
@@ -234,7 +240,7 @@ class ItemImage(models.Model):
 #     load = models.PositiveIntegerField()
 
 
-class Order(models.Model):
+class Order(LifecycleModelMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey('User', related_name='orders', on_delete=models.CASCADE)
     item = models.OneToOneField('Item', related_name='orders', on_delete=models.CASCADE)
@@ -268,13 +274,24 @@ class Order(models.Model):
     amount = models.PositiveIntegerField()
     downPaymentAmount = models.PositiveIntegerField(null=True, blank=True)
 
+    # TODO before save check if validTill is less than now and validFrom and range is not booked override save
+
+    # when order changes to paid create order out
+    @hook(AFTER_UPDATE, when='stage', changes_to='PD')
+    def create_order_out(self):
+        ou = OrderOut.objects.create(order=self)
+
+class OrderOut(models.Model):
+    order = models.OneToOneField("Order", on_delete=models.CASCADE)
+    active = models.BooleanField(default=True)
+
 class Rating(models.Model):
     order = models.OneToOneField('Order', related_name='rating', on_delete=models.CASCADE)
     item = models.PositiveIntegerField(default=0, validators = [MaxLengthValidator(5)])
     lender = models.PositiveIntegerField(default=0, validators = [MaxLengthValidator(5)])
     borrower = models.PositiveIntegerField(default=0, validators = [MaxLengthValidator(5)])
 
-class Payment(models.Model):
+class Payment(LifecycleModelMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     order = models.ForeignKey('Order', related_name='payment', on_delete=models.CASCADE)
 
@@ -300,15 +317,38 @@ class Payment(models.Model):
     state = models.CharField(default=PENDING, choices=STATE_CHOICES, max_length=5)
 
     LEASE_PAYMENT = 'LP'
+    RENT_PAYMENT = 'RP'
+    BOOKING_FEE = 'BF'
     DOWN_PAYMENT = 'DP'
 
     TYPE_CHOICES = [
-        (LEASE_PAYMENT, "Normal payment"),
+        (LEASE_PAYMENT, "Normal lease payment"),
+        (RENT_PAYMENT, "Normal rent payment"),
+        (BOOKING_FEE, "Booking Fee"),
         (DOWN_PAYMENT, "Down payment long term lease")
     ]
     type = models.CharField(default=LEASE_PAYMENT, choices=TYPE_CHOICES, max_length=5)
     amount = models.PositiveIntegerField()
     createdOn = models.DateTimeField(auto_now_add=True)
+    
+    # when payment is approved change order to paid and create a transaction
+    @hook(AFTER_UPDATE, when='state', changes_to='AD')
+    def update_order_stage(self):
+        # update order
+        order = self.order
+        order.stage = Order.PAID
+        order.save()
+
+        # create transaction
+        toObj = Shop if self.order.item.shop else User
+        toObjId = self.order.item.shop.id if self.order.item.shop else self.order.item.lender.id 
+
+        transaction = Transaction.objects.create(
+            payment=self, amount=self.amount,
+            sentFromObject=ContentType.objects.get_for_model(self.order.user),
+            sentFromObjectId=self.order.user.id,
+            sentToObject=ContentType.objects.get_for_model(toObj),
+            sentToObjectId=toObjId  )
 
 class Refund(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -321,7 +361,7 @@ class Wallet(models.Model):
     shop = models.ForeignKey('Shop', related_name='wallet', on_delete=models.SET_NULL, null=True, blank=True)
     balance = models.PositiveIntegerField()
 
-class Transaction(models.Model):
+class Transaction(LifecycleModelMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     PAYMENT = 'PT'
@@ -348,3 +388,32 @@ class Transaction(models.Model):
     createdOn = models.DateTimeField(auto_now_add=True)
 
     payment = models.ForeignKey('Payment', related_name='transactions', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # actions on shop/user wallet
+    @hook(AFTER_CREATE, on_commit=True)
+    def wallet_actions(self):
+        # add wallet balance
+        if self.type == self.PAYMENT:
+            if self.sentToObject == ContentType.objects.get_for_model(User):
+                # user/lender wallet
+                wallet = Wallet.objects.get(user_id= self.sentToObjectId)
+                wallet.balance += self.amount
+                wallet.save()
+            if self.sentToObject == ContentType.objects.get_for_model(Shop):
+                # shop wallet
+                wallet = Wallet.objects.get(shop_id=self.sentToObjectId)
+                wallet.balance += self.amount
+                wallet.save()
+
+        # deduct wallet balance
+        if self.type == self.WITHDRAWAL:
+            if self.sentToObject == ContentType.objects.get_for_model(User):
+                # user/lender wallet
+                wallet = Wallet.objects.get(user_id= self.sentToObjectId)
+                wallet.balance -= self.amount
+                wallet.save()
+            if self.sentToObject == ContentType.objects.get_for_model(Shop):
+                # shop wallet
+                wallet = Wallet.objects.get(shop_id=self.sentToObjectId)
+                wallet.balance -= self.amount
+                wallet.save()

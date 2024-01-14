@@ -1,7 +1,8 @@
+from datetime import date
 from typing import Optional
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
-from .models import User, Shop, Item, ItemImage, Pricing
+from .models import User, Shop, Item, ItemImage, Pricing, Order
 
 
 """ User """
@@ -16,7 +17,7 @@ class MyTokenObtainPairOutSchema(Schema):
     user: SlimUserSchema
 
 """ Shop """
-ShopSchema = create_schema(Shop, fields=['id', 'name', 'located', 'url', 'coverImage', 'slug'], optional_fields=['url', 'coverImage'])
+ShopSchema = create_schema(Shop, fields=['id', 'name', 'located', 'url', 'coverImage'], optional_fields=['url', 'coverImage'])
 
 """ Item """
 ItemImageSchema = create_schema(ItemImage, fields=['id', 'image', 'coverImage'])
@@ -49,5 +50,16 @@ class PricingSchemaIn(Schema):
 
 PricingSchema = create_schema(Pricing, fields=['item', 'type', 'period', 'amount', 'downPaymentAmount'], optional_fields=['__all__'])
 
+""" Order """
+class OrderSchemaIn(Schema):
+    item_id: str
+    type: str
+    stage: str
+    fromDate: date
+    tillDate: date 
+    amount: int
+    downPaymentAmount: int
+    
+OrderSchema = create_schema(Order, fields=['item', 'type', 'stage', 'fromDate', 'tillDate', 'amount', 'downPaymentAmount'], optional_fields=['__all__'])
 class Error(Schema):
     detail: str

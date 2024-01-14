@@ -2,6 +2,7 @@ from typing import List
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from django.core.files.storage import FileSystemStorage
+from django.contrib.contenttypes.models import ContentType
 from ninja import NinjaAPI, Router, Form, UploadedFile, File
 from ninja_extra import api_controller, route
 from ninja_jwt.authentication import JWTAuth
@@ -13,8 +14,8 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 from .utils import gen_shop_membeship_join_token
-from .models import User, UserAuthToken, Shop, Item, ItemImage, ShopMembership, Order, ShopMembershipToken, Pricing
-from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, PricingSchema, PricingSchemaIn, SlimUserSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn
+from .models import OrderOut, Transaction, User, UserAuthToken, Shop, Item, ItemImage, ShopMembership, Order, ShopMembershipToken, Pricing, Wallet
+from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, OrderSchema, OrderSchemaIn, PricingSchema, PricingSchemaIn, SlimUserSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn
 from .tasks import send_email_auth_token, send_email_shop_membership_join_token
 
 
@@ -120,7 +121,6 @@ class UserAPI:
            
 api.register_controllers(UserAPI)
 
-
 """ SHOP Related APIs """
 @api_controller("shop/", tags=["Shop"])
 class ShopAPI:
@@ -135,22 +135,26 @@ class ShopAPI:
         return shop
     
     # update shop
-    @route.put("{slug:slug}/update", auth=JWTAuth())
-    def update(self, request, slug, data):
-        shop = get_object_or_404(Shop, slug=slug)
+    @route.put("{str:id}/update", response=ShopSchema, auth=JWTAuth())
+    def update(self, request, id, data:ShopSchema ):
+        shop = get_object_or_404(Shop, id=id)
+        for attr, value in data.dict(exclude_unset=True).items():
+            setattr(shop, attr, value)
+        shop.save()
         return shop
     
     # upload shop cover image
-    @route.post("{slug:slug}/upload-ci", auth=JWTAuth())
-    def upload_cover_image(self, request, slug, file: UploadedFile = File(...)):
-        shop = get_object_or_404(Shop, slug=slug)
+    @route.post("{str:id}/upload-ci", auth=JWTAuth())
+    def upload_cover_image(self, request, id, file: UploadedFile = File(...)):
+        shop = get_object_or_404(Shop, id=id)
+        shop.coverImage.save(file.name, file)
         return shop
       
     # create add staff code
-    @route.post('{slug:slug}/join-token', response=create_schema(ShopMembershipToken, fields=['token', 'validTill']), auth=JWTAuth())
-    def join_token(self, request, slug, data: create_schema(User, fields=['email'])):
+    @route.post('{str:id}/join-token', response=create_schema(ShopMembershipToken, fields=['token', 'validTill']), auth=JWTAuth())
+    def join_token(self, request, id, data: create_schema(User, fields=['email'])):
         email_to = data.dict()['email']
-        shop = get_object_or_404(Shop, slug=slug)
+        shop = get_object_or_404(Shop, id=id)
         token = gen_shop_membeship_join_token(shop=shop, user=request.user)
         send_email_shop_membership_join_token(token, email_to)
         return token
@@ -167,22 +171,55 @@ class ShopAPI:
         return 403, {"detail": "Join token has expired"}
 
     # list staff
-    # payments
-    # transactions and wallet
+    @route.get("{str:id}/staff", response=List[create_schema(ShopMembership, fields=['user', 'role', 'joinedOn'])], auth=JWTAuth())
+    def staff(self, request, id):
+        memberships = ShopMembership.objects.filter(shop_id=id)
+        return memberships
+    
+    # transactions
+    @route.get("{str:id}/transactions", response=List[create_schema(Transaction, fields=['type', 'amount', 'createdOn'])] ,auth=JWTAuth())
+    def transactions(self, request, id):
+        queryset = Transaction.objects.filter(
+            sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
+            sentToObject=ContentType.objects.get_for_model(Shop), sentToObjectId=id)
+        return queryset
+    
+    # wallet and last 5 transactions
+    @route.get("{str:id}/wallet", response=create_schema(Wallet, fields=['shop', 'balance']))
+    def wallet(self, request, id):        
+        wallet = Wallet.objects.get(shop_id=id)
+        transactions = Transaction.objects.filter(
+            sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
+            sentToObject=ContentType.objects.get_for_model(Shop), sentToObjectId=id)[:5]
+        data = {
+            "wallet": wallet,
+            "transactions": transactions
+        }
+        return data
     # rented items
+    @route.get("{str:id}/ rented", auth=JWTAuth())
+    def rented_items(self, request, id):
+        queryset = OrderOut.objects.filter(order__item__shop_id=id, active=True)
+        return queryset
+    
     # deleted
+    @route.delete("{str:id}/delete", auth=JWTAuth())
+    def remove(self, request, id):
+        shop = get_object_or_404(Shop, id=id)
+        shop.delete()
+        return
 
     """ NON Auth APIs """
     # shop details
-    @route.get("{slug:slug}/details", response=ShopSchema)
-    def details(self, request, slug):
-        shop = get_object_or_404(Shop, slug=slug)
+    @route.get("{str:id}/details", response=ShopSchema)
+    def details(self, request, id):
+        shop = get_object_or_404(Shop, id=id)
         return shop
 
     # list shop(dealership or whatever) items(cars or whatever)
-    @route.get("{slug:slug}/items", response=List[ItemSchema])
-    def items(self, request, slug):
-        shop = Shop.objects.prefetch_related("items").get(slug=slug)
+    @route.get("{str:id}/items", response=List[ItemSchema])
+    def items(self, request, id):
+        shop = Shop.objects.prefetch_related("items").get(id=id)
         return shop.items.all()
 
 api.register_controllers(ShopAPI)
@@ -247,7 +284,7 @@ class ItemAPI:
         return imgs
 
     # delete item image
-    @route.put("{str:id}/delete-image/{imageId}", auth=JWTAuth())
+    @route.delete("{str:id}/delete-image/{imageId}", auth=JWTAuth())
     def remove_image(self, request, id, imageId: int):
         image = get_object_or_404(ItemImage, id=imageId, item_id=id)
         if image.coverImage:
@@ -257,7 +294,7 @@ class ItemAPI:
         return 
 
     # delete item
-    @route.put("{str:id}/delete", auth=JWTAuth())
+    @route.delete("{str:id}/delete", auth=JWTAuth())
     def remove(self, request, id):
         item = get_object_or_404(Item, id=id)
         item.delete()
@@ -270,18 +307,33 @@ class ItemAPI:
         items = Item.objects.all()
         return items
 
-
-
 api.register_controllers(ItemAPI)
 
 """ Order Related APIs """
 @api_controller("order/", tags=["Order"], auth=JWTAuth())
 class OrderAPI:
     # create
-    @route.post("new")
-    def create(self, request, data, files):
-        return
+    @route.post("new", response=OrderSchema)
+    def create(self, request, data: OrderSchemaIn):
+        order = Order.objects.create(**data.dict())
+        return order
+    
     # update
+    @route.put("{str:id}/update", response=OrderSchema)
+    def update(self, request, id, data: OrderSchema):
+        order = get_object_or_404(Order, id=id)
+        for attr, value in data.dict(exclude_unset=True).items():
+            setattr(order, attr, value)
+        order.save()
+        return order
+
     # delete
+    @route.delete("{str:id}/ delete")
+    def remove(self, request, id):
+        order = get_object_or_404(Order, id=id)
+        order.delete()
+        return
 
 api.register_controllers(OrderAPI)
+
+""" Payment Related APIs"""
