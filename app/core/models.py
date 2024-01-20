@@ -107,17 +107,12 @@ class ShopMembershipRole(models.TextChoices):
     OWNER = "OR", _("Owner")
     ADMIN = "AN", _("Admin")
 
-class ShopMembershipToken(LifecycleModelMixin, TokenBase):
+class ShopMembershipToken(TokenBase):
     user = models.ForeignKey('User', related_name='tokens', on_delete=models.SET_NULL, null=True, blank=True)
     shop = models.ForeignKey('Shop', related_name='tokens', on_delete=models.CASCADE)    
     role = models.CharField(default=ShopMembershipRole.ADMIN, choices=ShopMembershipRole.choices, max_length=5)
     createdBy = models.ForeignKey('User', related_name='created_tokens',  on_delete=models.SET_NULL, null=True, blank=True)
 
-    @hook(AFTER_UPDATE, when='user', has_changed=True)
-    def token_used(self):
-        self.valid = False
-        self.save()
-    
 class ShopMembership(models.Model):
     user = models.ForeignKey('User', related_name='shops', on_delete=models.CASCADE)
     shop = models.ForeignKey('Shop', related_name='staff', on_delete=models.CASCADE)
@@ -268,7 +263,7 @@ class Order(LifecycleModelMixin, models.Model):
     type = models.CharField(default=SHORT_TERM, choices=TYPE_CHOICES, max_length=5)
 
     stage = models.CharField(default=CART, choices=STAGE_CHOICES, max_length=5)
-    createOn = models.DateTimeField(auto_now_add=True)
+    createdOn = models.DateTimeField(auto_now_add=True)
     fromDate = models.DateTimeField(default=timezone.now)
     tillDate = models.DateTimeField(null=True, blank=True)
     amount = models.PositiveIntegerField()
@@ -284,6 +279,8 @@ class Order(LifecycleModelMixin, models.Model):
 class OrderOut(models.Model):
     order = models.OneToOneField("Order", on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
+    createdOn = models.DateTimeField(auto_now_add=True)
+
 
 class Rating(models.Model):
     order = models.OneToOneField('Order', related_name='rating', on_delete=models.CASCADE)

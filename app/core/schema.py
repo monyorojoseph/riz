@@ -2,8 +2,8 @@ from datetime import date
 from typing import Optional
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
-from .models import User, Shop, Item, ItemImage, Pricing, Order
-
+from .models import User, Shop, Item, ItemImage, Pricing, Order, ShopMembership, \
+    OrderOut, Wallet, Transaction
 
 """ User """
 SlimUserSchema = create_schema(User, fields=['email', 'fullName', 'id', 'verifiedEmail', 'verified'])
@@ -17,7 +17,14 @@ class MyTokenObtainPairOutSchema(Schema):
     user: SlimUserSchema
 
 """ Shop """
-ShopSchema = create_schema(Shop, fields=['id', 'name', 'located', 'url', 'coverImage'], optional_fields=['url', 'coverImage'])
+class ShopSchemaIn(Schema):
+    name: str
+    located: str = None
+    url: str = None
+
+ShopSchema = create_schema(Shop, fields=['id', 'name', 'located', 'url', 'coverImage'], optional_fields=['name', 'located', 'url', 'coverImage'])
+
+ShopMembershipSchema =  create_schema(ShopMembership, fields=['user', 'role', 'joinedOn'], custom_fields=[('user', SlimUserSchema, None)])
 
 """ Item """
 ItemImageSchema = create_schema(ItemImage, fields=['id', 'image', 'coverImage'])
@@ -48,7 +55,7 @@ class PricingSchemaIn(Schema):
     amount: int
     downPaymentAmount: int = None
 
-PricingSchema = create_schema(Pricing, fields=['item', 'type', 'period', 'amount', 'downPaymentAmount'], optional_fields=['__all__'])
+PricingSchema = create_schema(Pricing, fields=['item', 'type', 'period', 'amount', 'downPaymentAmount'])
 
 """ Order """
 class OrderSchemaIn(Schema):
@@ -60,6 +67,19 @@ class OrderSchemaIn(Schema):
     amount: int
     downPaymentAmount: int
     
-OrderSchema = create_schema(Order, fields=['item', 'type', 'stage', 'fromDate', 'tillDate', 'amount', 'downPaymentAmount'], optional_fields=['__all__'])
+OrderSchema = create_schema(Order, fields=['item', 'type', 'stage', 'fromDate', 'tillDate', 'amount', 'downPaymentAmount'])
+
+""" Order out/ rented"""
+OrderOutSchema = create_schema(OrderOut, fields=['order', 'createdOn'],custom_fields=[('order', OrderSchema, None)])
+
+""" Transaction """
+TransactionSchema = create_schema(Transaction, fields=['type', 'amount', 'createdOn'])
+
+""" Wallet """
+class ShopWalletSchema(Schema):
+    wallet: create_schema(Wallet, fields=['shop', 'balance'])
+    transactions: list[TransactionSchema]
+
+
 class Error(Schema):
     detail: str

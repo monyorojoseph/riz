@@ -14,8 +14,10 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 from .utils import gen_shop_membeship_join_token
-from .models import OrderOut, Transaction, User, UserAuthToken, Shop, Item, ItemImage, ShopMembership, Order, ShopMembershipToken, Pricing, Wallet
-from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, OrderSchema, OrderSchemaIn, PricingSchema, PricingSchemaIn, SlimUserSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn
+from .models import OrderOut, Transaction, User, UserAuthToken, Shop, Item, ItemImage, ShopMembership, Order, \
+    ShopMembershipToken, Pricing, Wallet, ShopMembershipRole
+from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, OrderOutSchema, OrderSchema, OrderSchemaIn, PricingSchema, \
+    PricingSchemaIn, ShopMembershipSchema, SlimUserSchema, TransactionSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn, ShopSchemaIn, ShopWalletSchema
 from .tasks import send_email_auth_token, send_email_shop_membership_join_token
 
 
@@ -127,11 +129,11 @@ class ShopAPI:
     """ NON Auth APIs """
     # create shop
     @route.post("new", response=ShopSchema, auth=JWTAuth())
-    def create(self, request, data: ShopSchema, file: UploadedFile = File(...)):
+    def create(self, request, data: ShopSchemaIn, file: UploadedFile = File(...)):
         shop = Shop(**data.dict())
         shop.coverImage.save(file.name, file)
         # make user the owner
-        sm = ShopMembership.objects.create(user=request.user, shop=shop, role=ShopMembership.OWNER)
+        sm = ShopMembership.objects.create(user=request.user, shop=shop, role=ShopMembershipRole.OWNER)
         return shop
     
     # update shop
@@ -144,7 +146,7 @@ class ShopAPI:
         return shop
     
     # upload shop cover image
-    @route.post("{str:id}/upload-ci", auth=JWTAuth())
+    @route.post("{str:id}/upload-ci", response=ShopSchema, auth=JWTAuth())
     def upload_cover_image(self, request, id, file: UploadedFile = File(...)):
         shop = get_object_or_404(Shop, id=id)
         shop.coverImage.save(file.name, file)
@@ -166,18 +168,19 @@ class ShopAPI:
         if token.is_valid:
             sm = ShopMembership.objects.create(user=request.user, shop=token.shop, role=token.role)
             token.user =request.user
+            token.valid = False
             token.save()
             return sm
         return 403, {"detail": "Join token has expired"}
 
     # list staff
-    @route.get("{str:id}/staff", response=List[create_schema(ShopMembership, fields=['user', 'role', 'joinedOn'])], auth=JWTAuth())
+    @route.get("{str:id}/staff", response=List[ShopMembershipSchema], auth=JWTAuth())
     def staff(self, request, id):
         memberships = ShopMembership.objects.filter(shop_id=id)
         return memberships
     
     # transactions
-    @route.get("{str:id}/transactions", response=List[create_schema(Transaction, fields=['type', 'amount', 'createdOn'])] ,auth=JWTAuth())
+    @route.get("{str:id}/transactions", response=List[TransactionSchema] ,auth=JWTAuth())
     def transactions(self, request, id):
         queryset = Transaction.objects.filter(
             sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
@@ -185,7 +188,7 @@ class ShopAPI:
         return queryset
     
     # wallet and last 5 transactions
-    @route.get("{str:id}/wallet", response=create_schema(Wallet, fields=['shop', 'balance']))
+    @route.get("{str:id}/wallet", response=ShopWalletSchema)
     def wallet(self, request, id):        
         wallet = Wallet.objects.get(shop_id=id)
         transactions = Transaction.objects.filter(
@@ -196,8 +199,9 @@ class ShopAPI:
             "transactions": transactions
         }
         return data
+    
     # rented items
-    @route.get("{str:id}/ rented", auth=JWTAuth())
+    @route.get("{str:id}/rented", response=List[OrderOutSchema], auth=JWTAuth())
     def rented_items(self, request, id):
         queryset = OrderOut.objects.filter(order__item__shop_id=id, active=True)
         return queryset
