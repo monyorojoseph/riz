@@ -7,6 +7,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxLengthValidator
 from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, AFTER_CREATE
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 
 
 class UserManager(BaseUserManager):
@@ -167,6 +168,7 @@ class Item(models.Model):
     detailsObjectId = models.PositiveIntegerField(null=True)
     details = GenericForeignKey("detailsObject", "detailsObjectId")
 
+    display = models.BooleanField(default=False)
     createdOn = models.DateTimeField(auto_now_add=True)
 
     type = models.CharField(default=ItemTypes.SALOON_CAR, choices=ItemTypes.choices, max_length=3)
@@ -175,7 +177,7 @@ class Item(models.Model):
         return f"{self.brandName} {self.modelName}" 
 
 class Pricing(models.Model):
-    item = models.OneToOneField('Item', related_name='prices', on_delete=models.CASCADE)
+    item = models.ForeignKey('Item', related_name='prices', on_delete=models.CASCADE)
 
     RENT = 'RT'
     LEASE = 'LE'
@@ -268,8 +270,8 @@ class Order(LifecycleModelMixin, models.Model):
     tillDate = models.DateTimeField(null=True, blank=True)
     amount = models.PositiveIntegerField()
     downPaymentAmount = models.PositiveIntegerField(null=True, blank=True)
+    bookingFee = models.PositiveIntegerField(null=True, blank=True)
 
-    # TODO before save check if validTill is less than now and validFrom and range is not booked override save
 
     # when order changes to paid create order out
     @hook(AFTER_UPDATE, when='stage', changes_to='PD')
@@ -327,6 +329,16 @@ class Payment(LifecycleModelMixin, models.Model):
     type = models.CharField(default=LEASE_PAYMENT, choices=TYPE_CHOICES, max_length=5)
     amount = models.PositiveIntegerField()
     createdOn = models.DateTimeField(auto_now_add=True)
+
+    # TODO before save check the order to verify (if validTill is less than now and validFrom and range is not booked override save)
+    def clean(self):
+        st, et = self.order.fromDate.date, self.tillDate.date
+        if Order.objects.filter(~Q(usert=self.order.user), item=self.order.item, fromDate__date__range=(st, et), tillDate__date=st, stage__in=[Order.PAID, Order.BOOK]).exists():
+            raise ValueError("Try diffrent dates those ones are already")
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
     
     # when payment is approved change order to paid and create a transaction
     @hook(AFTER_UPDATE, when='state', changes_to='AD')

@@ -26,27 +26,6 @@ ShopSchema = create_schema(Shop, fields=['id', 'name', 'located', 'url', 'coverI
 
 ShopMembershipSchema =  create_schema(ShopMembership, fields=['user', 'role', 'joinedOn'], custom_fields=[('user', SlimUserSchema, None)])
 
-""" Item """
-ItemImageSchema = create_schema(ItemImage, fields=['id', 'image', 'coverImage'])
-class ItemSchema(ModelSchema):
-    images: list[ItemImageSchema] = []
-    shop: Optional[ShopSchema] = None
-    lender: Optional[SlimUserSchema] = None
-    class Meta:
-        model = Item
-        fields=['id', 'modelName', 'brandName', 'yom', 'type', 'detailsObject', 'detailsObjectId']
-        optional_fields=['detailsObject', 'detailsObjectId']
-    
-
-class ItemSchemaIn(Schema):
-    modelName: str
-    brandName: str
-    yom: str
-    type: str
-    lender_id: str = None
-    shop_id: int = None
-
-
 """ Pricing """
 class PricingSchemaIn(Schema):
     item_id: str
@@ -55,7 +34,30 @@ class PricingSchemaIn(Schema):
     amount: int
     downPaymentAmount: int = None
 
-PricingSchema = create_schema(Pricing, fields=['item', 'type', 'period', 'amount', 'downPaymentAmount'])
+PricingSchema = create_schema(Pricing, fields=['id', 'item', 'type', 'period', 'amount', 'downPaymentAmount'],
+                              optional_fields=['item', 'type', 'period', 'amount', 'downPaymentAmount'])
+
+
+""" Item """
+ItemImageSchema = create_schema(ItemImage, fields=['id', 'image', 'coverImage'])
+ItemSchema = create_schema(Item, fields=['id', 'modelName', 'brandName', 'yom', 'type', 'detailsObject', 'detailsObjectId'],
+                           optional_fields=['modelName', 'brandName', 'yom', 'type', 'detailsObject', 'detailsObjectId'],
+                           custom_fields=[                                                    
+                            ('images', list[ItemImageSchema], []),
+                            ('shop', Optional[ShopSchema], None),
+                            ('lender', Optional[SlimUserSchema], None),
+                            ('prices', list[PricingSchema], [])
+                           ])       
+        
+    
+class ItemSchemaIn(Schema):
+    modelName: str
+    brandName: str
+    yom: str
+    type: str
+    lender_id: str = None
+    shop_id: str = None
+
 
 """ Order """
 class OrderSchemaIn(Schema):

@@ -120,6 +120,9 @@ class UserAPI:
         return
      
     # user listed items
+    # user orders & order outs
+    # user transaction/payments
+    # user wallet
            
 api.register_controllers(UserAPI)
 
@@ -233,14 +236,14 @@ api.register_controllers(ShopAPI)
 class ItemAPI:
     """ Auth APIs """
     # create item
-    @route.post("new",response=ItemSchema, auth=JWTAuth())
+    @route.post("new", response=ItemSchema, auth=JWTAuth())
     def create(self, request, data: ItemSchemaIn, files: File[list[UploadedFile]]):
         item = Item(**data.dict())
         item.save()
         # create images
         images = [ItemImage(image=file, item=item) for file in files]
-        imgs = ItemImage.objects.bulk_create(images)
-        di = imgs.first()
+        ItemImage.objects.bulk_create(images)
+        di = item.images.first()
         di.coverImage = True
         di.save()
         return item
@@ -269,7 +272,6 @@ class ItemAPI:
         prices = Pricing.objects.bulk_create(prs)
         return prices
 
-
     # update pricing
     @route.put("{str:id}/update-pricing/{pricingId}", response=PricingSchema, auth=JWTAuth())
     def update_pricing(self, request, id, pricingId: int, data: PricingSchema):
@@ -278,6 +280,13 @@ class ItemAPI:
             setattr(pricing, attr, value)
         pricing.save()
         return pricing
+    
+    # delete pricing
+    @route.delete("{str:id}/delete-pricing/{pricingId}",  auth=JWTAuth())
+    def remove_pricing(self, request, id, pricingId: int ):
+        pricing = get_object_or_404(Pricing, id=pricingId, item_id=id)
+        pricing.delete()
+        return
 
     # add item images
     @route.post("{str:id}/add-images", response=List[ItemImageSchema], auth=JWTAuth())
@@ -310,6 +319,11 @@ class ItemAPI:
     def items(self, request):
         items = Item.objects.all()
         return items
+    
+    @route.get("{str:id}/details", response=ItemSchema)
+    def details(self, request, id):
+        item = get_object_or_404(Item, id=id)
+        return item
 
 api.register_controllers(ItemAPI)
 
@@ -319,7 +333,7 @@ class OrderAPI:
     # create
     @route.post("new", response=OrderSchema)
     def create(self, request, data: OrderSchemaIn):
-        order = Order.objects.create(**data.dict())
+        order = Order.objects.create(**data.dict(), user=request.user)
         return order
     
     # update
@@ -330,6 +344,8 @@ class OrderAPI:
             setattr(order, attr, value)
         order.save()
         return order
+    
+    # order review
 
     # delete
     @route.delete("{str:id}/ delete")
@@ -341,3 +357,7 @@ class OrderAPI:
 api.register_controllers(OrderAPI)
 
 """ Payment Related APIs"""
+@api_controller("payment/", tags=["Payment"], auth=JWTAuth())
+class PaymentAPI:
+    # make payment
+    pass
