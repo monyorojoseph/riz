@@ -3,7 +3,7 @@ from typing import Optional
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
 from .models import User, Shop, Item, ItemImage, Pricing, Order, ShopMembership, \
-    OrderOut, Wallet, Transaction
+    OrderOut, Wallet, Transaction, Payment
 
 """ User """
 SlimUserSchema = create_schema(User, fields=['email', 'fullName', 'id', 'verifiedEmail', 'verified'])
@@ -74,12 +74,18 @@ OrderSchema = create_schema(Order, fields=['item', 'type', 'stage', 'fromDate', 
 """ Order out/ rented"""
 OrderOutSchema = create_schema(OrderOut, fields=['order', 'createdOn'],custom_fields=[('order', OrderSchema, None)])
 
+""" Payment """
+PaymentSchema = create_schema(Payment, fields=['id','method', 'state', 'type', 'amount', 'createdOn'])
+
 """ Transaction """
 TransactionSchema = create_schema(Transaction, fields=['type', 'amount', 'createdOn'])
 
 """ Wallet """
 class ShopWalletSchema(Schema):
     wallet: create_schema(Wallet, fields=['shop', 'balance'])
+    transactions: list[TransactionSchema]
+class UserWalletSchema(Schema):
+    wallet: create_schema(Wallet, fields=['user', 'balance'])
     transactions: list[TransactionSchema]
 
 

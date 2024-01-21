@@ -91,7 +91,6 @@ class TokenBase(models.Model):
         now = timezone.now()
         return self.valid and (self.validFrom < now and self.validTill > now)
 
-
 class UserAuthToken(TokenBase):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='auth_tokens')
     
@@ -138,7 +137,6 @@ class Shop(LifecycleModelMixin, models.Model):
     def after_create_actions(self):
         # create shop wallet
         wallet = Wallet.objects.create(shop=self, balance=0)
-
     
 class ItemTypes(models.TextChoices):
     BICYCLE = 'BCE', _("Bicycle")
@@ -282,7 +280,6 @@ class OrderOut(models.Model):
     order = models.OneToOneField("Order", on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
     createdOn = models.DateTimeField(auto_now_add=True)
-
 
 class Rating(models.Model):
     order = models.OneToOneField('Order', related_name='rating', on_delete=models.CASCADE)

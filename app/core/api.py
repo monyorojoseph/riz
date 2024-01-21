@@ -15,9 +15,9 @@ from ninja.responses import codes_4xx
 
 from .utils import gen_shop_membeship_join_token
 from .models import OrderOut, Transaction, User, UserAuthToken, Shop, Item, ItemImage, ShopMembership, Order, \
-    ShopMembershipToken, Pricing, Wallet, ShopMembershipRole
-from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, OrderOutSchema, OrderSchema, OrderSchemaIn, PricingSchema, \
-    PricingSchemaIn, ShopMembershipSchema, SlimUserSchema, TransactionSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn, ShopSchemaIn, ShopWalletSchema
+    ShopMembershipToken, Pricing, Wallet, ShopMembershipRole, Payment
+from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, OrderOutSchema, OrderSchema, OrderSchemaIn, PaymentSchema, PricingSchema, \
+    PricingSchemaIn, ShopMembershipSchema, SlimUserSchema, TransactionSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn, ShopSchemaIn, ShopWalletSchema, UserWalletSchema
 from .tasks import send_email_auth_token, send_email_shop_membership_join_token
 
 
@@ -25,9 +25,6 @@ STORAGE = FileSystemStorage()
 api = NinjaExtraAPI()
 
 """ AUTH Related APIs """
-# get Tokens
-# api.register_controllers(NinjaJWTDefaultController)
-
 @api_controller("auth/", tags=['Auth'])
 class AuthAPI:
     # JWT Token
@@ -120,9 +117,54 @@ class UserAPI:
         return
      
     # user listed items
-    # user orders & order outs
-    # user transaction/payments
+    @route.get("items", response=List[ItemSchema])
+    def my_items(self, request):
+        queryset = request.user.items.all()
+        return queryset
+    
+    # user orders 
+    @route.get("orders", response=List[OrderSchema])
+    def my_orders(self, request):
+        queryset = request.user.orders.all()
+        return queryset
+    #  order outs
+    @route.get("out-order", response=List[OrderOutSchema])
+    def my_out_orders(self, request):
+        queryset = OrderOut.objects.filter(order__user=request.user)
+        return queryset
+    
+    # user /payments
+    @route.get("payments", response=List[PaymentSchema])
+    def my_payments(self, request):
+        queryset = Payment.objects.filter(order__user=request.user)
+        return queryset
+    
+    # transaction
+    @route.get("transactions", response=List[TransactionSchema])
+    def my_transactions(self, request):
+        queryset = Transaction.objects.filter(
+            sentFromObject = ContentType.objects.get_for_model(User),
+            sentFromObjectId = request.user.id,
+            sentToObject = ContentType.objects.get_for_model(User),
+            sentToObjectId = request.user.id
+        )
+        return queryset
+
+    
     # user wallet
+    @route.get("wallet", response=UserWalletSchema)
+    def my_wallet(self, request):
+        transactions = Transaction.objects.filter(
+            sentFromObject = ContentType.objects.get_for_model(User),
+            sentFromObjectId = request.user.id,
+            sentToObject = ContentType.objects.get_for_model(User),
+            sentToObjectId = request.user.id
+        )
+        data = {
+            "wallet": request.user.wallet,
+            "transactions": transactions
+        }
+        return data
            
 api.register_controllers(UserAPI)
 
@@ -290,7 +332,7 @@ class ItemAPI:
 
     # add item images
     @route.post("{str:id}/add-images", response=List[ItemImageSchema], auth=JWTAuth())
-    def add_images(self, request, files: File[list[UploadedFile]]):
+    def add_images(self, request, id, files: File[list[UploadedFile]]):
         item = get_object_or_404(Item, id=id)
         images = [ItemImage(image=file, item=item) for file in files]
         imgs = ItemImage.objects.bulk_create(images)

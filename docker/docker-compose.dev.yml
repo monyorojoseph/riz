@@ -10,6 +10,8 @@ services:
       - ../app/.env.db
     volumes:
       - pg_db_vm:/var/lib/postgresql/data
+    networks:
+      - riz_network
       
   redis:
     image: redis
@@ -18,6 +20,11 @@ services:
       - 6379:6379
     volumes:
       - redis_server_vm:/data
+    networks:
+      - riz_network
+
+networks:
+  riz_network:
 
 volumes:
   pg_db_vm:
