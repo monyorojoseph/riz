@@ -75,6 +75,6 @@ jobs:
 
         - name: Build Image and Push
           run: |
-            docker build -t riz -f ./docker/Django/Dockerfile .
+            docker build -t riz -f ./docker/Django/Dockerfile app
             docker tag riz:latest monyorojoseph/riz:v0.1.0
             docker push monyorojoseph/riz:v0.1.0
