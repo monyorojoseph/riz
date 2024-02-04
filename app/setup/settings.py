@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'setup.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PG_DB'),
-        'HOST': os.environ.get('PG_HOST'),
-        'USER': os.environ.get('PG_USER'),
-        'PASSWORD': os.environ.get('PG_PASSWORD'),
-        'PORT': os.environ.get('PG_PORT')
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'PORT': os.environ.get('POSTGRES_PORT')
     }
 }
 
@@ -97,6 +97,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = False
 EMAIL_USE_TLS= True
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -218,4 +219,75 @@ HUEY = {
         'check_worker_health': True,  # Enable worker health checks.
         'health_check_interval': 1,  # Check worker health every second.
     },
+}
+
+LOG_LEVEL = os.getenv('DJANGO_LOG_LEVEL', 'INFO')
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{name} {asctime} {levelname} {message}',
+            'style': '{',
+            'datefmt': '%W/%d/%Y %H:%M'
+        },
+        'simple': {
+            "()": "coloredlogs.ColoredFormatter",
+            'format': '[ {name} ] {levelname} {message}',
+            'style': '{',
+            
+        },
+    },
+    "filters": {
+        "require_debug_true": {
+             "()": "django.utils.log.RequireDebugTrue",
+        },
+        "require_debug_false": {
+             "()": "django.utils.log.RequireDebugFalse",
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            "formatter": "simple",
+            "filters": [ 'require_debug_true' ]
+        },
+        # "file": {
+        #     "level": "INFO",
+        #     "class": "logging.FileHandler",
+        #     "filename": f"{LOG_DIR}/info.log",
+        #     "formatter": "verbose",
+        #     "filters": [ 'require_debug_false' ]
+        # }
+    },
+    'loggers': {
+        'django.db': {
+            'handlers': ['console'],
+            'level': LOG_LEVEL,
+            "propagate": False
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': LOG_LEVEL,
+            "propagate": False
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': LOG_LEVEL,
+            "propagate": False
+        },
+        'django.template': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            "propagate": False
+        },
+        'core': {            
+            'handlers': ['console'],
+            'level': LOG_LEVEL,
+            "propagate": False            
+        }
+    }
 }
