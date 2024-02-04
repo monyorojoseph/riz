@@ -1,0 +1,29 @@
+version: '3.9'
+
+x-app: &default-app
+  image: monyorojoseph/riz:v0.1.0
+  env_file:
+    - .env.staging
+
+services:
+  app:
+    <<: *default-app
+    command: gunicorn --bind 0.0.0.0:8000 setup.wsgi
+    ports:
+      - 8000:8000
+
+  redis:
+    image: redis:7.2.3
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_db:/data
+
+  tasks:
+    <<: *default-app
+    command: python manage.py run_huey
+    depends_on:
+      - redis
+
+volumes:
+  redis_db:
