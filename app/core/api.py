@@ -13,12 +13,10 @@ from ninja_jwt.authentication import JWTAuth
 from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
-from .utils import gen_shop_membeship_join_token
-from .models import OrderOut, Transaction, User, UserAuthToken, Shop, Item, ItemImage, ShopMembership, Order, \
-    ShopMembershipToken, Pricing, Wallet, ShopMembershipRole, Payment
-from .schema import Error, ItemImageSchema, MyTokenObtainPairOutSchema, OrderOutSchema, OrderSchema, OrderSchemaIn, PaymentSchema, PricingSchema, \
-    PricingSchemaIn, ShopMembershipSchema, SlimUserSchema, TransactionSchema, UserSchema, UpdateUserSchema, ShopSchema, ItemSchema, ItemSchemaIn, ShopSchemaIn, ShopWalletSchema, UserWalletSchema
-from .tasks import send_email_auth_token, send_email_shop_membership_join_token
+# from .utils import gen_shop_membeship_join_token
+from .models import User, UserAuthToken
+from .schema import Error, MyTokenObtainPairOutSchema, SlimUserSchema,  UserSchema, UpdateUserSchema
+from .tasks import send_email_auth_token
 
 
 STORAGE = FileSystemStorage()
@@ -33,7 +31,7 @@ class AuthAPI:
         uat = UserAuthToken.objects.get(token = data.dict()['token'])
         if uat.is_valid:
             user = uat.user
-            if uat.type == UserAuthToken.REGISTER:
+            if uat.type == UserAuthToken.REGISTER or uat.type == UserAuthToken.EMAIL_VERIFY:
                 user.verifiedEmail = True
                 user.save()
             
@@ -67,6 +65,8 @@ class AuthAPI:
             send_email_auth_token(user, UserAuthToken.REGISTER)
             return user   
         return 403, {"detail": "User already exists or invalid credentials"} 
+
+    # verify email
 
 api.register_controllers(AuthAPI)
 
@@ -116,44 +116,44 @@ class UserAPI:
         user.delete()
         return
      
-    # user listed items
-    @route.get("items", response=List[ItemSchema])
-    def my_items(self, request):
-        queryset = request.user.items.all()
-        return queryset
+    # # user listed items
+    # @route.get("items", response=List[ItemSchema])
+    # def my_items(self, request):
+    #     queryset = request.user.items.all()
+    #     return queryset
     
-    # user orders 
-    @route.get("orders", response=List[OrderSchema])
-    def my_orders(self, request):
-        queryset = request.user.orders.all()
-        return queryset
-    #  order outs
-    @route.get("out-order", response=List[OrderOutSchema])
-    def my_out_orders(self, request):
-        queryset = OrderOut.objects.filter(order__user=request.user)
-        return queryset
+    # # user orders 
+    # @route.get("orders", response=List[OrderSchema])
+    # def my_orders(self, request):
+    #     queryset = request.user.orders.all()
+    #     return queryset
+    # #  order outs
+    # @route.get("out-order", response=List[OrderOutSchema])
+    # def my_out_orders(self, request):
+    #     queryset = OrderOut.objects.filter(order__user=request.user)
+    #     return queryset
     
-    # user /payments
-    @route.get("payments", response=List[PaymentSchema])
-    def my_payments(self, request):
-        queryset = Payment.objects.filter(order__user=request.user)
-        return queryset
+    # # user /payments
+    # @route.get("payments", response=List[PaymentSchema])
+    # def my_payments(self, request):
+    #     queryset = Payment.objects.filter(order__user=request.user)
+    #     return queryset
     
-    # transaction
-    @route.get("transactions", response=List[TransactionSchema])
-    def my_transactions(self, request):
-        queryset = Transaction.objects.filter(
-            sentFromObject = ContentType.objects.get_for_model(User),
-            sentFromObjectId = request.user.id,
-            sentToObject = ContentType.objects.get_for_model(User),
-            sentToObjectId = request.user.id
-        )
-        return queryset
+    # # transaction
+    # @route.get("transactions", response=List[TransactionSchema])
+    # def my_transactions(self, request):
+    #     queryset = Transaction.objects.filter(
+    #         sentFromObject = ContentType.objects.get_for_model(User),
+    #         sentFromObjectId = request.user.id,
+    #         sentToObject = ContentType.objects.get_for_model(User),
+    #         sentToObjectId = request.user.id
+    #     )
+    #     return queryset
 
     
-    # user wallet
-    @route.get("wallet", response=UserWalletSchema)
-    def my_wallet(self, request):
+    # # user wallet
+    # @route.get("wallet", response=UserWalletSchema)
+    # def my_wallet(self, request):
         transactions = Transaction.objects.filter(
             sentFromObject = ContentType.objects.get_for_model(User),
             sentFromObjectId = request.user.id,
@@ -168,238 +168,238 @@ class UserAPI:
            
 api.register_controllers(UserAPI)
 
-""" SHOP Related APIs """
-@api_controller("shop/", tags=["Shop"])
-class ShopAPI:
-    """ NON Auth APIs """
-    # create shop
-    @route.post("new", response=ShopSchema, auth=JWTAuth())
-    def create(self, request, data: ShopSchemaIn, file: UploadedFile = File(...)):
-        shop = Shop(**data.dict())
-        shop.coverImage.save(file.name, file)
-        # make user the owner
-        sm = ShopMembership.objects.create(user=request.user, shop=shop, role=ShopMembershipRole.OWNER)
-        return shop
+# """ SHOP Related APIs """
+# @api_controller("shop/", tags=["Shop"])
+# class ShopAPI:
+#     """ NON Auth APIs """
+#     # create shop
+#     @route.post("new", response=ShopSchema, auth=JWTAuth())
+#     def create(self, request, data: ShopSchemaIn, file: UploadedFile = File(...)):
+#         shop = Shop(**data.dict())
+#         shop.coverImage.save(file.name, file)
+#         # make user the owner
+#         sm = ShopMembership.objects.create(user=request.user, shop=shop, role=ShopMembershipRole.OWNER)
+#         return shop
     
-    # update shop
-    @route.put("{str:id}/update", response=ShopSchema, auth=JWTAuth())
-    def update(self, request, id, data:ShopSchema ):
-        shop = get_object_or_404(Shop, id=id)
-        for attr, value in data.dict(exclude_unset=True).items():
-            setattr(shop, attr, value)
-        shop.save()
-        return shop
+#     # update shop
+#     @route.put("{str:id}/update", response=ShopSchema, auth=JWTAuth())
+#     def update(self, request, id, data:ShopSchema ):
+#         shop = get_object_or_404(Shop, id=id)
+#         for attr, value in data.dict(exclude_unset=True).items():
+#             setattr(shop, attr, value)
+#         shop.save()
+#         return shop
     
-    # upload shop cover image
-    @route.post("{str:id}/upload-ci", response=ShopSchema, auth=JWTAuth())
-    def upload_cover_image(self, request, id, file: UploadedFile = File(...)):
-        shop = get_object_or_404(Shop, id=id)
-        shop.coverImage.save(file.name, file)
-        return shop
+#     # upload shop cover image
+#     @route.post("{str:id}/upload-ci", response=ShopSchema, auth=JWTAuth())
+#     def upload_cover_image(self, request, id, file: UploadedFile = File(...)):
+#         shop = get_object_or_404(Shop, id=id)
+#         shop.coverImage.save(file.name, file)
+#         return shop
       
-    # create add staff code
-    @route.post('{str:id}/join-token', response=create_schema(ShopMembershipToken, fields=['token', 'validTill']), auth=JWTAuth())
-    def join_token(self, request, id, data: create_schema(User, fields=['email'])):
-        email_to = data.dict()['email']
-        shop = get_object_or_404(Shop, id=id)
-        token = gen_shop_membeship_join_token(shop=shop, user=request.user)
-        send_email_shop_membership_join_token(token, email_to)
-        return token
+#     # create add staff code
+#     @route.post('{str:id}/join-token', response=create_schema(ShopMembershipToken, fields=['token', 'validTill']), auth=JWTAuth())
+#     def join_token(self, request, id, data: create_schema(User, fields=['email'])):
+#         email_to = data.dict()['email']
+#         shop = get_object_or_404(Shop, id=id)
+#         token = gen_shop_membeship_join_token(shop=shop, user=request.user)
+#         send_email_shop_membership_join_token(token, email_to)
+#         return token
     
-    # staff join using code
-    @route.post('join', response={200: create_schema(ShopMembership, fields=['role', 'shop', 'role']), codes_4xx: Error}, auth=JWTAuth())
-    def join(self, request, data: create_schema(ShopMembershipToken, fields=['token'])):
-        token = ShopMembershipToken.objects.get(token=data.dict()['token'])
-        if token.is_valid:
-            sm = ShopMembership.objects.create(user=request.user, shop=token.shop, role=token.role)
-            token.user =request.user
-            token.valid = False
-            token.save()
-            return sm
-        return 403, {"detail": "Join token has expired"}
+#     # staff join using code
+#     @route.post('join', response={200: create_schema(ShopMembership, fields=['role', 'shop', 'role']), codes_4xx: Error}, auth=JWTAuth())
+#     def join(self, request, data: create_schema(ShopMembershipToken, fields=['token'])):
+#         token = ShopMembershipToken.objects.get(token=data.dict()['token'])
+#         if token.is_valid:
+#             sm = ShopMembership.objects.create(user=request.user, shop=token.shop, role=token.role)
+#             token.user =request.user
+#             token.valid = False
+#             token.save()
+#             return sm
+#         return 403, {"detail": "Join token has expired"}
 
-    # list staff
-    @route.get("{str:id}/staff", response=List[ShopMembershipSchema], auth=JWTAuth())
-    def staff(self, request, id):
-        memberships = ShopMembership.objects.filter(shop_id=id)
-        return memberships
+#     # list staff
+#     @route.get("{str:id}/staff", response=List[ShopMembershipSchema], auth=JWTAuth())
+#     def staff(self, request, id):
+#         memberships = ShopMembership.objects.filter(shop_id=id)
+#         return memberships
     
-    # transactions
-    @route.get("{str:id}/transactions", response=List[TransactionSchema] ,auth=JWTAuth())
-    def transactions(self, request, id):
-        queryset = Transaction.objects.filter(
-            sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
-            sentToObject=ContentType.objects.get_for_model(Shop), sentToObjectId=id)
-        return queryset
+#     # transactions
+#     @route.get("{str:id}/transactions", response=List[TransactionSchema] ,auth=JWTAuth())
+#     def transactions(self, request, id):
+#         queryset = Transaction.objects.filter(
+#             sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
+#             sentToObject=ContentType.objects.get_for_model(Shop), sentToObjectId=id)
+#         return queryset
     
-    # wallet and last 5 transactions
-    @route.get("{str:id}/wallet", response=ShopWalletSchema)
-    def wallet(self, request, id):        
-        wallet = Wallet.objects.get(shop_id=id)
-        transactions = Transaction.objects.filter(
-            sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
-            sentToObject=ContentType.objects.get_for_model(Shop), sentToObjectId=id)[:5]
-        data = {
-            "wallet": wallet,
-            "transactions": transactions
-        }
-        return data
+#     # wallet and last 5 transactions
+#     @route.get("{str:id}/wallet", response=ShopWalletSchema)
+#     def wallet(self, request, id):        
+#         wallet = Wallet.objects.get(shop_id=id)
+#         transactions = Transaction.objects.filter(
+#             sentFromObject=ContentType.objects.get_for_model(Shop), sentFromObjectId=id,
+#             sentToObject=ContentType.objects.get_for_model(Shop), sentToObjectId=id)[:5]
+#         data = {
+#             "wallet": wallet,
+#             "transactions": transactions
+#         }
+#         return data
     
-    # rented items
-    @route.get("{str:id}/rented", response=List[OrderOutSchema], auth=JWTAuth())
-    def rented_items(self, request, id):
-        queryset = OrderOut.objects.filter(order__item__shop_id=id, active=True)
-        return queryset
+#     # rented items
+#     @route.get("{str:id}/rented", response=List[OrderOutSchema], auth=JWTAuth())
+#     def rented_items(self, request, id):
+#         queryset = OrderOut.objects.filter(order__item__shop_id=id, active=True)
+#         return queryset
     
-    # deleted
-    @route.delete("{str:id}/delete", auth=JWTAuth())
-    def remove(self, request, id):
-        shop = get_object_or_404(Shop, id=id)
-        shop.delete()
-        return
+#     # deleted
+#     @route.delete("{str:id}/delete", auth=JWTAuth())
+#     def remove(self, request, id):
+#         shop = get_object_or_404(Shop, id=id)
+#         shop.delete()
+#         return
 
-    """ NON Auth APIs """
-    # shop details
-    @route.get("{str:id}/details", response=ShopSchema)
-    def details(self, request, id):
-        shop = get_object_or_404(Shop, id=id)
-        return shop
+#     """ NON Auth APIs """
+#     # shop details
+#     @route.get("{str:id}/details", response=ShopSchema)
+#     def details(self, request, id):
+#         shop = get_object_or_404(Shop, id=id)
+#         return shop
 
-    # list shop(dealership or whatever) items(cars or whatever)
-    @route.get("{str:id}/items", response=List[ItemSchema])
-    def items(self, request, id):
-        shop = Shop.objects.prefetch_related("items").get(id=id)
-        return shop.items.all()
+#     # list shop(dealership or whatever) items(cars or whatever)
+#     @route.get("{str:id}/items", response=List[ItemSchema])
+#     def items(self, request, id):
+#         shop = Shop.objects.prefetch_related("items").get(id=id)
+#         return shop.items.all()
 
-api.register_controllers(ShopAPI)
+# api.register_controllers(ShopAPI)
 
-""" Item Related APIs """
-@api_controller("item/", tags=["Item"])
-class ItemAPI:
-    """ Auth APIs """
-    # create item
-    @route.post("new", response=ItemSchema, auth=JWTAuth())
-    def create(self, request, data: ItemSchemaIn, files: File[list[UploadedFile]]):
-        item = Item(**data.dict())
-        item.save()
-        # create images
-        images = [ItemImage(image=file, item=item) for file in files]
-        ItemImage.objects.bulk_create(images)
-        di = item.images.first()
-        di.coverImage = True
-        di.save()
-        return item
+# """ Item Related APIs """
+# @api_controller("item/", tags=["Item"])
+# class ItemAPI:
+#     """ Auth APIs """
+#     # create item
+#     @route.post("new", response=ItemSchema, auth=JWTAuth())
+#     def create(self, request, data: ItemSchemaIn, files: File[list[UploadedFile]]):
+#         item = Item(**data.dict())
+#         item.save()
+#         # create images
+#         images = [ItemImage(image=file, item=item) for file in files]
+#         ItemImage.objects.bulk_create(images)
+#         di = item.images.first()
+#         di.coverImage = True
+#         di.save()
+#         return item
     
-    # set cover image
-    @route.get("{id}/set-ci/{imageId}", auth=JWTAuth())
-    def set_cover_image(self, request, id: str, imageId: int):
-        image = ItemImage.objects.get(id=imageId, item_id=id)
-        image.coverImage = True
-        image.save()
-        return
+#     # set cover image
+#     @route.get("{id}/set-ci/{imageId}", auth=JWTAuth())
+#     def set_cover_image(self, request, id: str, imageId: int):
+#         image = ItemImage.objects.get(id=imageId, item_id=id)
+#         image.coverImage = True
+#         image.save()
+#         return
 
-    # update details
-    @route.put("{str:id}/update", response=ItemSchema, auth=JWTAuth())
-    def update(self, request, id, data: ItemSchema):
-        item = get_object_or_404(Item, id=id)
-        for attr, value in data.dict(exclude_unset=True).items():
-            setattr(item, attr, value)
-        item.save()
-        return item
+#     # update details
+#     @route.put("{str:id}/update", response=ItemSchema, auth=JWTAuth())
+#     def update(self, request, id, data: ItemSchema):
+#         item = get_object_or_404(Item, id=id)
+#         for attr, value in data.dict(exclude_unset=True).items():
+#             setattr(item, attr, value)
+#         item.save()
+#         return item
 
-    # create pricing
-    @route.post("{str:id}/create-pricing", response=List[PricingSchema], auth=JWTAuth())
-    def create_pricing(self, request, id, data: List[PricingSchemaIn]):
-        prs =[ Pricing(**dt.dict()) for dt in data]
-        prices = Pricing.objects.bulk_create(prs)
-        return prices
+#     # create pricing
+#     @route.post("{str:id}/create-pricing", response=List[PricingSchema], auth=JWTAuth())
+#     def create_pricing(self, request, id, data: List[PricingSchemaIn]):
+#         prs =[ Pricing(**dt.dict()) for dt in data]
+#         prices = Pricing.objects.bulk_create(prs)
+#         return prices
 
-    # update pricing
-    @route.put("{str:id}/update-pricing/{pricingId}", response=PricingSchema, auth=JWTAuth())
-    def update_pricing(self, request, id, pricingId: int, data: PricingSchema):
-        pricing = get_object_or_404(Pricing, id=pricingId, item_id=id)
-        for attr, value in data.dict(exclude_unset=True).items():
-            setattr(pricing, attr, value)
-        pricing.save()
-        return pricing
+#     # update pricing
+#     @route.put("{str:id}/update-pricing/{pricingId}", response=PricingSchema, auth=JWTAuth())
+#     def update_pricing(self, request, id, pricingId: int, data: PricingSchema):
+#         pricing = get_object_or_404(Pricing, id=pricingId, item_id=id)
+#         for attr, value in data.dict(exclude_unset=True).items():
+#             setattr(pricing, attr, value)
+#         pricing.save()
+#         return pricing
     
-    # delete pricing
-    @route.delete("{str:id}/delete-pricing/{pricingId}",  auth=JWTAuth())
-    def remove_pricing(self, request, id, pricingId: int ):
-        pricing = get_object_or_404(Pricing, id=pricingId, item_id=id)
-        pricing.delete()
-        return
+#     # delete pricing
+#     @route.delete("{str:id}/delete-pricing/{pricingId}",  auth=JWTAuth())
+#     def remove_pricing(self, request, id, pricingId: int ):
+#         pricing = get_object_or_404(Pricing, id=pricingId, item_id=id)
+#         pricing.delete()
+#         return
 
-    # add item images
-    @route.post("{str:id}/add-images", response=List[ItemImageSchema], auth=JWTAuth())
-    def add_images(self, request, id, files: File[list[UploadedFile]]):
-        item = get_object_or_404(Item, id=id)
-        images = [ItemImage(image=file, item=item) for file in files]
-        imgs = ItemImage.objects.bulk_create(images)
-        return imgs
+#     # add item images
+#     @route.post("{str:id}/add-images", response=List[ItemImageSchema], auth=JWTAuth())
+#     def add_images(self, request, id, files: File[list[UploadedFile]]):
+#         item = get_object_or_404(Item, id=id)
+#         images = [ItemImage(image=file, item=item) for file in files]
+#         imgs = ItemImage.objects.bulk_create(images)
+#         return imgs
 
-    # delete item image
-    @route.delete("{str:id}/delete-image/{imageId}", auth=JWTAuth())
-    def remove_image(self, request, id, imageId: int):
-        image = get_object_or_404(ItemImage, id=imageId, item_id=id)
-        if image.coverImage:
-            return 403, {"detail": "Select another picture to be cover image then delete."}
+#     # delete item image
+#     @route.delete("{str:id}/delete-image/{imageId}", auth=JWTAuth())
+#     def remove_image(self, request, id, imageId: int):
+#         image = get_object_or_404(ItemImage, id=imageId, item_id=id)
+#         if image.coverImage:
+#             return 403, {"detail": "Select another picture to be cover image then delete."}
         
-        image.delete()
-        return 
+#         image.delete()
+#         return 
 
-    # delete item
-    @route.delete("{str:id}/delete", auth=JWTAuth())
-    def remove(self, request, id):
-        item = get_object_or_404(Item, id=id)
-        item.delete()
-        return 
+#     # delete item
+#     @route.delete("{str:id}/delete", auth=JWTAuth())
+#     def remove(self, request, id):
+#         item = get_object_or_404(Item, id=id)
+#         item.delete()
+#         return 
 
-    """ NON Auth APIs """
-    # list items (filtering by: model and brand name, type, engine size)
-    @route.get("list", response=List[ItemSchema])
-    def items(self, request):
-        items = Item.objects.all()
-        return items
+#     """ NON Auth APIs """
+#     # list items (filtering by: model and brand name, type, engine size)
+#     @route.get("list", response=List[ItemSchema])
+#     def items(self, request):
+#         items = Item.objects.all()
+#         return items
     
-    @route.get("{str:id}/details", response=ItemSchema)
-    def details(self, request, id):
-        item = get_object_or_404(Item, id=id)
-        return item
+#     @route.get("{str:id}/details", response=ItemSchema)
+#     def details(self, request, id):
+#         item = get_object_or_404(Item, id=id)
+#         return item
 
-api.register_controllers(ItemAPI)
+# api.register_controllers(ItemAPI)
 
-""" Order Related APIs """
-@api_controller("order/", tags=["Order"], auth=JWTAuth())
-class OrderAPI:
-    # create
-    @route.post("new", response=OrderSchema)
-    def create(self, request, data: OrderSchemaIn):
-        order = Order.objects.create(**data.dict(), user=request.user)
-        return order
+# """ Order Related APIs """
+# @api_controller("order/", tags=["Order"], auth=JWTAuth())
+# class OrderAPI:
+#     # create
+#     @route.post("new", response=OrderSchema)
+#     def create(self, request, data: OrderSchemaIn):
+#         order = Order.objects.create(**data.dict(), user=request.user)
+#         return order
     
-    # update
-    @route.put("{str:id}/update", response=OrderSchema)
-    def update(self, request, id, data: OrderSchema):
-        order = get_object_or_404(Order, id=id)
-        for attr, value in data.dict(exclude_unset=True).items():
-            setattr(order, attr, value)
-        order.save()
-        return order
+#     # update
+#     @route.put("{str:id}/update", response=OrderSchema)
+#     def update(self, request, id, data: OrderSchema):
+#         order = get_object_or_404(Order, id=id)
+#         for attr, value in data.dict(exclude_unset=True).items():
+#             setattr(order, attr, value)
+#         order.save()
+#         return order
     
-    # order review
+#     # order review
 
-    # delete
-    @route.delete("{str:id}/ delete")
-    def remove(self, request, id):
-        order = get_object_or_404(Order, id=id)
-        order.delete()
-        return
+#     # delete
+#     @route.delete("{str:id}/ delete")
+#     def remove(self, request, id):
+#         order = get_object_or_404(Order, id=id)
+#         order.delete()
+#         return
 
-api.register_controllers(OrderAPI)
+# api.register_controllers(OrderAPI)
 
-""" Payment Related APIs"""
-@api_controller("payment/", tags=["Payment"], auth=JWTAuth())
-class PaymentAPI:
-    # make payment
-    pass
+# """ Payment Related APIs"""
+# @api_controller("payment/", tags=["Payment"], auth=JWTAuth())
+# class PaymentAPI:
+#     # make payment
+#     pass

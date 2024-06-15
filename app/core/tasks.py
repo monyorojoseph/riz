@@ -14,9 +14,9 @@ def send_email_auth_token(user, type):
     except Exception as e:
         logger.error(e)
 
-@db_task()
-def send_email_shop_membership_join_token(token, email_to):
-    try:
-        email_shop_membership_join_toke(token, email_to)
-    except Exception as e:
-        logger.error(e)
+# @db_task()
+# def send_email_shop_membership_join_token(token, email_to):
+#     try:
+#         email_shop_membership_join_toke(token, email_to)
+#     except Exception as e:
+#         logger.error(e)
