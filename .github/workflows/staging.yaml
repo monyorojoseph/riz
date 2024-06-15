@@ -7,11 +7,7 @@ on:
 
 
 env:
-    POSTGRES_PASSWORD: postgres
-    POSTGRES_USER: postgres
-    POSTGRES_DB: postgres
-    POSTGRES_HOST: localhost
-    POSTGRES_PORT: 5432
+    DB_URL: postgres://postgres:postgres@localhost:5432/postgres
     DJANGO_LOG_LEVEL: WARNING
     EMAIL_HOST: smtp.gmail.com
     EMAIL_PORT: 587
