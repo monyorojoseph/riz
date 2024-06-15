@@ -3,19 +3,21 @@ version: '3.9'
 x-app: &default-app
   image: monyorojoseph/riz:v0.1.0
   env_file:
-    - .env.staging
+    - .env
 
 services:
   app:
     <<: *default-app
     container_name: rizApp
+    restart: unless-stopped  
     command: gunicorn --bind 0.0.0.0:8000 setup.wsgi
     ports:
       - 8000:8000
 
   redis:
     image: redis:7.2.3
-    container_name: rizRed
+    container_name: rizRedis
+    restart: unless-stopped  
     ports:
       - 6379:6379
     volumes:
@@ -25,6 +27,7 @@ services:
     <<: *default-app
     command: python manage.py run_huey
     container_name: rizTasks
+    restart: unless-stopped  
     depends_on:
       - redis
 
