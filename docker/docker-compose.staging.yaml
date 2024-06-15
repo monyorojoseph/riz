@@ -8,22 +8,25 @@ x-app: &default-app
 services:
   app:
     <<: *default-app
+    container_name: rizApp
     command: gunicorn --bind 0.0.0.0:8000 setup.wsgi
     ports:
       - 8000:8000
 
   redis:
     image: redis:7.2.3
+    container_name: rizRed
     ports:
       - 6379:6379
     volumes:
-      - redis_db:/data
+      - riz_redis_db:/data
 
   tasks:
     <<: *default-app
     command: python manage.py run_huey
+    container_name: rizTasks
     depends_on:
       - redis
 
 volumes:
-  redis_db:
+  riz_redis_db:

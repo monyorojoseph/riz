@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
@@ -78,15 +79,14 @@ WSGI_APPLICATION = 'setup.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# postgres://USER:PASSWORD@HOST:PORT/NAME
+DB_URL = os.environ.get("DB_URL", "postgres://riz:riz@localhost:5432/riz")
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB'),
-        'HOST': os.environ.get('POSTGRES_HOST'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'PORT': os.environ.get('POSTGRES_PORT')
-    }
+    'default': dj_database_url.config(
+        default=DB_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Email
@@ -134,12 +134,42 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-# STATICFILES_DIRS = [BASE_DIR / 'static/']
+if DEBUG:
+    STATIC_URL = 'static/'
+    STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-MEDIA_URL = 'media/'
-MEDIA_ROOT =  BASE_DIR / 'media/'
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT =  BASE_DIR / 'media/'
+else:
+    STORAGE_ACCOUNT_KEY = os.environ.get("STORAGE_ACCOUNT_KEY")
+    STORAGE_ACCOUNT_NAME = os.environ.get("STORAGE_ACCOUNT_NAME")
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+            "account_key": STORAGE_ACCOUNT_KEY,
+            "account_name": STORAGE_ACCOUNT_NAME,
+            "azure_container": "rizmedia"
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+            "account_key": STORAGE_ACCOUNT_KEY,
+            "account_name": STORAGE_ACCOUNT_NAME,
+            "azure_container": "rizstatic"
+            },
+        },
+    }
+
+    STATIC_URL = f'https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net/'
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+    MEDIA_URL = f'https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net/'
+    MEDIA_ROOT =  BASE_DIR / 'media/'
 
 
 # Default primary key field type
