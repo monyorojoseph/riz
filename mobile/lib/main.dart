@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:fquery/fquery.dart';
 import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/pages/auth/register.dart';
 import 'package:mobile/pages/auth/verification.dart';
 import 'package:mobile/pages/home/home.dart';
+import 'package:mobile/pages/notifications/notifications.dart';
 import 'package:mobile/utils/storage.dart';
 
+import 'pages/account/account.dart';
+import 'pages/history/history.dart';
+
+final queryClient = QueryClient(
+  defaultQueryOptions: DefaultQueryOptions(),
+);
 void main() {
-  runApp(MyApp());
+  runApp(QueryClientProvider(queryClient: queryClient, child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -37,11 +45,14 @@ class MyApp extends StatelessWidget {
       // initialRoute: LoginPage.routeName,
       onGenerateInitialRoutes: _onGenerateInitialRoutes,
       routes: {
-        HomePage.routeName: (context) => HomePage(),
+        HomePage.routeName: (context) => const HomePage(),
         LoginPage.routeName: (context) => const LoginPage(),
         RegisterPage.routeName: (context) => const RegisterPage(),
         AuthVerificationPage.routeName: (context) =>
             const AuthVerificationPage(),
+        AccountPage.routeName: (context) => const AccountPage(),
+        HistoryPage.routeName: (context) => const HistoryPage(),
+        NotificationsPage.routeName: (context) => const NotificationsPage(),
       },
     );
   }
@@ -72,7 +83,7 @@ class MyApp extends StatelessWidget {
             tokens.containsKey('accessToken') &&
             tokens.containsKey('refreshToken')) {
           // Tokens are available, navigate to Home page
-          return HomePage(); // Replace with logic based on tokens if needed
+          return const HomePage(); // Replace with logic based on tokens if needed
         } else {
           // Tokens are not available or invalid, navigate to Login page
           return const LoginPage(); // Replace with logic based on tokens if needed

@@ -1,3 +1,5 @@
+import 'package:mobile/classes/user.dart';
+
 class LoginUser {
   final String fullName;
   final String email;
@@ -38,7 +40,7 @@ class RegisterUser {
 class AuthenticatedUser {
   final String refresh;
   final String access;
-  final User user;
+  final SlimUser user;
 
   const AuthenticatedUser(
       {required this.refresh, required this.access, required this.user});
@@ -47,32 +49,7 @@ class AuthenticatedUser {
     return AuthenticatedUser(
         refresh: json['refresh'] as String,
         access: json['access'] as String,
-        user: User.fromJson(json['user'] as Map<String, dynamic>));
-  }
-}
-
-class User {
-  final String id;
-  final String fullName;
-  final String email;
-  final bool verifiedEmail;
-  final bool verified;
-
-  const User(
-      {required this.id,
-      required this.email,
-      required this.fullName,
-      required this.verifiedEmail,
-      required this.verified});
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      fullName: json['fullName'] as String,
-      verifiedEmail: json['verifiedEmail'] as bool,
-      verified: json['verified'] as bool,
-    );
+        user: SlimUser.fromJson(json['user'] as Map<String, dynamic>));
   }
 }
 
