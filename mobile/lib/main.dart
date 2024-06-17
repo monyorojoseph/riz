@@ -4,7 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/pages/auth/register.dart';
 import 'package:mobile/pages/auth/verification.dart';
-import 'package:mobile/pages/home.dart';
+import 'package:mobile/pages/home/home.dart';
 import 'package:mobile/utils/storage.dart';
 
 void main() {
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       // initialRoute: LoginPage.routeName,
       onGenerateInitialRoutes: _onGenerateInitialRoutes,
       routes: {
-        HomePage.routeName: (context) => const HomePage(),
+        HomePage.routeName: (context) => HomePage(),
         LoginPage.routeName: (context) => const LoginPage(),
         RegisterPage.routeName: (context) => const RegisterPage(),
         AuthVerificationPage.routeName: (context) =>
@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
             tokens.containsKey('accessToken') &&
             tokens.containsKey('refreshToken')) {
           // Tokens are available, navigate to Home page
-          return const HomePage(); // Replace with logic based on tokens if needed
+          return HomePage(); // Replace with logic based on tokens if needed
         } else {
           // Tokens are not available or invalid, navigate to Login page
           return const LoginPage(); // Replace with logic based on tokens if needed

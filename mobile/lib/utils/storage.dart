@@ -18,6 +18,21 @@ class MyCustomSecureStorage {
 
   String? _getAccountName() =>
       _accountNameController.text.isEmpty ? null : _accountNameController.text;
+  // String value = await storage.read(key: key);
+  Future<String?> read({required String key}) async {
+    try {
+      final value = await _storage.read(
+        key: key,
+        iOptions: _getIOSOptions(),
+        aOptions: _getAndroidOptions(),
+      );
+      return value;
+    } catch (e) {
+      // Handle error
+      debugPrint('Error reading all items: $e');
+      return null;
+    }
+  }
 
   Future<Map<String, String>> readAll() async {
     try {

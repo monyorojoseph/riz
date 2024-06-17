@@ -14,6 +14,9 @@ class MyTokenObtainPairOutSchema(Schema):
     access: str
     user: SlimUserSchema
 
+class LogoutSchema(Schema):
+    access: str
+
 # """ Shop """
 # class ShopSchemaIn(Schema):
 #     name: str

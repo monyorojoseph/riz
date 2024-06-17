@@ -15,7 +15,7 @@ from ninja.responses import codes_4xx
 
 # from .utils import gen_shop_membeship_join_token
 from .models import User, UserAuthToken
-from .schema import Error, MyTokenObtainPairOutSchema, SlimUserSchema,  UserSchema, UpdateUserSchema
+from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema,  UserSchema, UpdateUserSchema
 from .tasks import send_email_auth_token
 
 
@@ -67,6 +67,17 @@ class AuthAPI:
         return 403, {"detail": "User already exists or invalid credentials"} 
 
     # verify email
+    # logout    # Login
+    @route.post("logout")
+    def logout(self, request, data: LogoutSchema):
+        try:
+            print(data.access)
+            token = RefreshToken(data.access)
+            token.blacklist()
+            return 200
+        except Exception as e:
+            return 403
+
 
 api.register_controllers(AuthAPI)
 
@@ -154,17 +165,17 @@ class UserAPI:
     # # user wallet
     # @route.get("wallet", response=UserWalletSchema)
     # def my_wallet(self, request):
-        transactions = Transaction.objects.filter(
-            sentFromObject = ContentType.objects.get_for_model(User),
-            sentFromObjectId = request.user.id,
-            sentToObject = ContentType.objects.get_for_model(User),
-            sentToObjectId = request.user.id
-        )
-        data = {
-            "wallet": request.user.wallet,
-            "transactions": transactions
-        }
-        return data
+        # transactions = Transaction.objects.filter(
+        #     sentFromObject = ContentType.objects.get_for_model(User),
+        #     sentFromObjectId = request.user.id,
+        #     sentToObject = ContentType.objects.get_for_model(User),
+        #     sentToObjectId = request.user.id
+        # )
+        # data = {
+        #     "wallet": request.user.wallet,
+        #     "transactions": transactions
+        # }
+        # return data
            
 api.register_controllers(UserAPI)
 
