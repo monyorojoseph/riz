@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:http/http.dart';
+import 'package:mobile/pages/account/editprofile.dart';
+import 'package:mobile/pages/account/verification.dart';
 import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/services/auth.dart';
 import 'package:mobile/services/user.dart';
@@ -27,6 +28,37 @@ class AccountPage extends StatelessWidget {
           children: <Widget>[
             const SizedBox(height: 100),
             const UserDetails(),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, ProfilePage.routeName);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Text(
+                    "Edit profile",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, UserVerificationPage.routeName);
+                },
+                child: const Row(children: <Widget>[
+                  Text(
+                    "Verification",
+                    style: TextStyle(color: Colors.black),
+                  )
+                ])),
             const SizedBox(height: 30),
             Logout()
           ],
@@ -95,13 +127,15 @@ class Logout extends StatelessWidget {
         children: <Widget>[
           Icon(
             Icons.logout_rounded,
-            color: Colors.black,
+            color: Colors.black45,
           ),
           SizedBox(width: 20),
           Text(
             "Logout",
             style: TextStyle(
-                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+                color: Colors.black45,
+                fontSize: 18,
+                fontWeight: FontWeight.bold),
           )
         ],
       ),

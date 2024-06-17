@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mobile/classes/auth.dart';
+import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/pages/auth/verification.dart';
 import 'package:mobile/services/auth.dart';
 
@@ -13,8 +14,23 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: <Widget>[const Text("Register Form"), RegisterForm()],
+      body: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
+          child: Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Center(
+                  child: Text("Create Account"),
+                ),
+                const SizedBox(height: 50),
+                RegisterForm()
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -56,7 +72,10 @@ class RegisterForm extends HookWidget {
               FormBuilderValidators.required(),
             ]),
           ),
+          const SizedBox(height: 30),
           MaterialButton(
+            minWidth: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.symmetric(vertical: 7.5),
             color: Colors.black,
             onPressed: () async {
               // _formKey.currentState?.saveAndValidate();
@@ -89,9 +108,25 @@ class RegisterForm extends HookWidget {
             },
             child: const Text(
               'Register',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
-          )
+          ),
+          const SizedBox(height: 20),
+          const Text("or"),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, LoginPage.routeName);
+            },
+            child: const Text(
+              "login",
+              style: TextStyle(
+                  decoration: TextDecoration.underline, color: Colors.black54),
+            ),
+          ),
         ],
       ),
     );

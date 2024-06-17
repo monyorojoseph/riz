@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
+import 'package:mobile/pages/account/editprofile.dart';
+import 'package:mobile/pages/account/verification.dart';
 import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/pages/auth/register.dart';
 import 'package:mobile/pages/auth/verification.dart';
@@ -53,6 +55,9 @@ class MyApp extends StatelessWidget {
         AccountPage.routeName: (context) => const AccountPage(),
         HistoryPage.routeName: (context) => const HistoryPage(),
         NotificationsPage.routeName: (context) => const NotificationsPage(),
+        ProfilePage.routeName: (context) => const ProfilePage(),
+        UserVerificationPage.routeName: (context) =>
+            const UserVerificationPage(),
       },
     );
   }

@@ -12,22 +12,36 @@ class AuthVerificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _args =
+    final args =
         ModalRoute.of(context)!.settings.arguments as AuthVerificationPageArgs;
+    String fullName = args.fullName;
 
     return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          const Text("Token Auth Verification"),
-          AuthVerificationForm()
-        ],
+      body: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
+          child: Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text("Token Auth Verification"),
+                const SizedBox(height: 10),
+                Text(
+                    "$fullName Auth token has been sent to your email, use it to login."),
+                AuthVerificationForm(email: args.email)
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
 class AuthVerificationForm extends HookWidget {
-  AuthVerificationForm({super.key});
+  final String email;
+  AuthVerificationForm({super.key, required this.email});
 
   final _formKey = GlobalKey<FormBuilderState>();
   final _storage = MyCustomSecureStorage();
@@ -46,7 +60,10 @@ class AuthVerificationForm extends HookWidget {
               FormBuilderValidators.required(),
             ]),
           ),
+          const SizedBox(height: 30),
           MaterialButton(
+            minWidth: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.symmetric(vertical: 7.5),
             color: Colors.black,
             onPressed: () async {
               if (_formKey.currentState?.saveAndValidate() ?? false) {
@@ -81,7 +98,10 @@ class AuthVerificationForm extends HookWidget {
             },
             child: const Text(
               'Submit',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
           ),
         ],
