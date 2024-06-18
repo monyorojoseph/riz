@@ -55,7 +55,7 @@ class AccountPage extends StatelessWidget {
                 },
                 child: const Row(children: <Widget>[
                   Text(
-                    "Verification",
+                    "Get verified",
                     style: TextStyle(color: Colors.black),
                   )
                 ])),
