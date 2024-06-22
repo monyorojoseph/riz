@@ -132,6 +132,116 @@ class UserSetting(models.Model):
     ]
     currentScreen = models.CharField(default=CLIENT_SCREEN, choices=UserCurrentScreen)
 
+class VehicleTypes(models.TextChoices):
+    LAND = "LND", _("Land vehicles")
+    WATER = "WTR", _("Watercraft")
+    AIR = "AIR", _("Aircraft")
+
+class Vehicle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    modelName = models.CharField(max_length=200)
+    brandName = models.CharField(max_length=200)
+    yom = models.CharField(max_length=6, null=True)
+    category = models.CharField(default=VehicleTypes.LAND, choices=VehicleTypes.choices, max_length=3)
+    
+    seller = models.ForeignKey('User', related_name='vehicles', on_delete=models.SET_NULL, null=True, blank=True)
+    # shop = models.ForeignKey('Shop', related_name='vehicles', on_delete=models.SET_NULL, null=True, blank=True)
+
+    contentType = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    contentId = models.PositiveIntegerField(null=True)
+    contentObject = GenericForeignKey("contentType", "contentId")
+
+    display = models.BooleanField(default=False)
+    createdOn = models.DateTimeField(auto_now_add=True)
+    updatedOn = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.brandName} {self.modelName}" 
+
+class VehicleImage(models.Model):
+    vehicle = models.ForeignKey('Vehicle', related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='vehicles')
+    coverImage = models.BooleanField(default=False)
+
+class LandVehicleTypes(models.TextChoices):
+    BICYCLE = 'BCE', _("Bicycle")
+
+    DIRTY_BIKE = 'DB', _("Dirty Bike")
+    NAKED_BIKE = 'NB', _("Naked Bike")
+    SPORTS_BIKE = 'SB', _("Sports Bike")
+    MOTOR_CYCLE = 'MC', _("Motor Cycle")
+    SALOON_CAR = 'SC', _("Car")
+    HATCH_BACK = 'HB', _("Hatch back")
+    CONVERTIBLE = 'CTE', _("Convertible")
+    COUPE_CAR = 'CC', _("Coupe")
+    LUXURY_CAR = 'LC', _("Lucury")
+    SPORTS_CAR = 'SSC', _("Sorts Car")
+    SUV = 'SUV', _("SUV")
+    PICK_UP_TRUCK = 'PP', _("Pick up")
+    DOUBLE_CAB_TRUCK = 'DCT', _("Double Cab Truck")
+    VAN = 'VAN', _("Van")
+    BUS = 'BUS', _("Bus")
+    LORRY = 'LY', _("Lorry")
+    TRACTOR = 'TR', _("Tractor")
+
+class LandVehicle(models.Model):
+    
+    COMBUSTION = 'CN'
+    HYBRID = 'HD'
+    ELECTRIC = 'EC'
+
+    ENGINE_TYPE_CHOICES = [
+        (COMBUSTION, "Combustion engine"),
+        (HYBRID, "Hybrid engine"),
+        (ELECTRIC, "Electric engine")
+    ]
+
+    engineType = models.CharField(choices=ENGINE_TYPE_CHOICES, max_length=5, null=True, blank=True)
+    engineSize = models.CharField(null=True, blank=True)
+    doors = models.PositiveIntegerField(null=True, blank=True)
+    passengers = models.PositiveIntegerField(default=1)
+    load = models.PositiveIntegerField()
+    
+    DIESEL = "DSL"
+    PETROL = "PTL"
+    HYBRID = "HBD"
+    ELECTRIC = "ELC"
+
+    FUEL_TYPE_CHOICES = [
+        (DIESEL, "Diesel"),
+        (PETROL, "Petrol"),
+        (ELECTRIC, "Electric"),
+        (HYBRID, "Hybrid")
+    ]
+
+    fuelType = models.CharField(choices=FUEL_TYPE_CHOICES, max_length=5, null=True, blank=True)
+
+    AUTOMATIC = "AT"
+    MANUAL = "ML"
+    CVT = "CVT"
+
+    TRANSIMISSION_TYPE_CHOICES = [
+        (AUTOMATIC, "Automatic"),
+        (MANUAL, "Manual"),
+        (CVT, "CVT")
+    ]
+
+    transmission = models.CharField(choices=TRANSIMISSION_TYPE_CHOICES, max_length=5, null=True, blank=True)
+
+    FOUR_WHEEL = "4WD"
+    TWO_WHEEL = "2WD"
+    ALL_WHEEL ="AWD"
+
+    DRIVETRAIN_TYPE_CHOICES = [
+        (FOUR_WHEEL, "Four Wheel"),
+        (TWO_WHEEL, "Two Wheel"),
+        (ALL_WHEEL, "All Wheel")
+    ]
+
+    drivetrain = models.CharField(choices=DRIVETRAIN_TYPE_CHOICES, max_length=5, null=True, blank=True)
+    type = models.CharField(default=LandVehicleTypes.SALOON_CAR, choices=VehicleTypes.choices, max_length=5)
+
+
 
 # class ShopMembershipRole(models.TextChoices):
 #     OWNER = "OR", _("Owner")
@@ -168,41 +278,6 @@ class UserSetting(models.Model):
 #         # create shop wallet
 #         wallet = Wallet.objects.create(shop=self, balance=0)
     
-# class ItemTypes(models.TextChoices):
-#     BICYCLE = 'BCE', _("Bicycle")
-#     DIRTY_BIKE = 'DB', _("Dirty Bike")
-#     MOTOR_CYCLE = 'MC', _("Motor Cycle")
-#     SALOON_CAR = 'SC', _("Car")
-#     HATCH_BACK = 'HB', _("Hatch back")
-#     CONVERTIBLE = 'CTE', _("Convertible")
-#     COUPE_CAR = 'CC', _("Coupe")
-#     SPORTS_CAR = 'SSC', _("Sorts Car")
-#     SUV = 'SUV', _("SUV")
-#     PICK_UP_TRUCK = 'PP', _("Pick up")
-#     DOUBLE_CAB_TRUCK = 'DCT', _("Double Cab Truck")
-#     LORRY = 'LY', _("Lorry")
-#     TRACTOR = 'TR', _("Tractor")
-
-# class Item(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     modelName = models.CharField(max_length=200)
-#     brandName = models.CharField(max_length=200)
-#     yom = models.CharField(max_length=6, null=True)
-    
-#     lender = models.ForeignKey('User', related_name='items', on_delete=models.SET_NULL, null=True, blank=True)
-#     shop = models.ForeignKey('Shop', related_name='items', on_delete=models.SET_NULL, null=True, blank=True)
-
-#     detailsObject = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
-#     detailsObjectId = models.PositiveIntegerField(null=True)
-#     details = GenericForeignKey("detailsObject", "detailsObjectId")
-
-#     display = models.BooleanField(default=False)
-#     createdOn = models.DateTimeField(auto_now_add=True)
-
-#     type = models.CharField(default=ItemTypes.SALOON_CAR, choices=ItemTypes.choices, max_length=3)
-
-#     def __str__(self) -> str:
-#         return f"{self.brandName} {self.modelName}" 
 
 # class Pricing(models.Model):
 #     item = models.ForeignKey('Item', related_name='prices', on_delete=models.CASCADE)
@@ -230,39 +305,6 @@ class UserSetting(models.Model):
 #     period = models.CharField(default=DAY, choices=PERIOD_CHOICES, max_length=5)
 #     amount = models.PositiveIntegerField()
 #     downPaymentAmount = models.PositiveIntegerField(null=True, blank=True)
-
-# class ItemImage(models.Model):
-#     item = models.ForeignKey('Item', related_name='images', on_delete=models.CASCADE)
-#     image = models.ImageField(upload_to='item_images')
-#     coverImage = models.BooleanField(default=False)
-
-# class VehicleBase(models.Model):
-
-#     COMBUSTION = 'CN'
-#     HYBRID = 'HD'
-#     ELECTRIC = 'EC'
-
-#     ENGINE_TYPE_CHOICES = [
-#         (COMBUSTION, "Combustion engine"),
-#         (HYBRID, "Hybrid engine"),
-#         (ELECTRIC, "Electric engine")
-#     ]
-
-#     engineType = models.CharField(default=COMBUSTION, choices=ENGINE_TYPE_CHOICES, default=5)
-#     engineSize = models.CharField()
-#     # doors = models.PositiveIntegerField()
-
-#     class Meta:
-#         abstract =True
-
-# class Vehicle(VehicleBase):
-#     pass
-
-# class Lorry(VehicleBase):
-#     load = models.PositiveIntegerField()
-
-# class Tractor(VehicleBase):
-#     load = models.PositiveIntegerField()
 
 
 # class Order(LifecycleModelMixin, models.Model):

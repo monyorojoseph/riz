@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/bottomnavbar/clientbottomnavbaritems.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:mobile/widgets/bottomnavbar/sellerbottomnavbar.dart';
 
-class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({super.key});
-  static const routeName = '/notifications';
+class SellerNotificationPage extends HookWidget {
+  const SellerNotificationPage({super.key});
+  static const routeName = '/sellernotification';
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class NotificationsPage extends StatelessWidget {
           ),
         ]),
         bottomNavigationBar: const BottomAppBar(
-            child: ClientBottomNavbarItems(
+            child: SellerBottomNavbarItems(
           currentTab: routeName,
         )),
       ),

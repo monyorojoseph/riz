@@ -14,8 +14,8 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 # from .utils import gen_shop_membeship_join_token
-from .models import User, UserAuthToken, UserSetting
-from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema, UpdateUserSettingSchema,  UserSchema, UpdateUserSchema, UserSettingSchema
+from .models import User, UserAuthToken, UserSetting, Vehicle
+from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema, UpdateUserSettingSchema,  UserSchema, UpdateUserSchema, UserSettingSchema, VehicleSchema
 from .tasks import send_email_auth_token
 
 
@@ -127,11 +127,11 @@ class UserAPI:
         user.delete()
         return 200
      
-    # # user listed items
-    # @route.get("items", response=List[ItemSchema])
-    # def my_items(self, request):
-    #     queryset = request.user.items.all()
-    #     return queryset
+    # user listed vehicles
+    @route.get("vehicles", response=List[VehicleSchema])
+    def my_listed_vehicles(self, request):
+        queryset = request.user.vehicles.all()
+        return queryset
     
     # # user orders 
     # @route.get("orders", response=List[OrderSchema])
@@ -198,6 +198,15 @@ class UserSettingsAPI:
         return usersetting
 
 api.register_controllers(UserSettingsAPI)
+
+""" VEHICLE Related APIs """
+# @api_controller("vehicle/", tags=["Vehicle"])
+# class VehicleAPI:
+#     # create 
+#     pass
+
+# api.register_controllers(VehicleAPI)
+
 
 # """ SHOP Related APIs """
 # @api_controller("shop/", tags=["Shop"])

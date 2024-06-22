@@ -6,6 +6,10 @@ import 'package:mobile/pages/history/history.dart';
 import 'package:mobile/pages/home/home.dart';
 import 'package:mobile/pages/loaders/switchpage.dart';
 import 'package:mobile/pages/notifications/notifications.dart';
+import 'package:mobile/pages/seller/calendar.dart';
+import 'package:mobile/pages/seller/home.dart';
+import 'package:mobile/pages/seller/menu.dart';
+import 'package:mobile/pages/seller/notifications.dart';
 import 'package:mobile/services/user.dart';
 
 class SellerBottomNavbarItems extends HookWidget {
@@ -28,7 +32,7 @@ class SellerBottomNavbarItems extends HookWidget {
                 pageBuilder: (BuildContext context,
                     Animation<double> animation1,
                     Animation<double> animation2) {
-                  return const HomePage();
+                  return const SellerHomePage();
                 },
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
@@ -48,7 +52,7 @@ class SellerBottomNavbarItems extends HookWidget {
                 pageBuilder: (BuildContext context,
                     Animation<double> animation1,
                     Animation<double> animation2) {
-                  return const HistoryPage();
+                  return const SellerCalendarPage();
                 },
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
@@ -83,7 +87,7 @@ class SellerBottomNavbarItems extends HookWidget {
                 pageBuilder: (BuildContext context,
                     Animation<double> animation1,
                     Animation<double> animation2) {
-                  return const NotificationsPage();
+                  return const SellerNotificationPage();
                 },
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
@@ -103,7 +107,7 @@ class SellerBottomNavbarItems extends HookWidget {
                 pageBuilder: (BuildContext context,
                     Animation<double> animation1,
                     Animation<double> animation2) {
-                  return const AccountPage();
+                  return const SellerMenuPage();
                 },
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,

@@ -10,9 +10,14 @@ import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/pages/auth/register.dart';
 import 'package:mobile/pages/auth/verification.dart';
 import 'package:mobile/pages/home/home.dart';
+import 'package:mobile/pages/loaders/mainpage.dart';
 import 'package:mobile/pages/loaders/switchpage.dart';
 import 'package:mobile/pages/notifications/notifications.dart';
+import 'package:mobile/pages/seller/calendar.dart';
 import 'package:mobile/pages/seller/home.dart';
+import 'package:mobile/pages/seller/menu.dart';
+import 'package:mobile/pages/seller/notifications.dart';
+import 'package:mobile/pages/seller/vehicle/create.dart';
 import 'package:mobile/utils/storage.dart';
 
 import 'pages/account/account.dart';
@@ -65,9 +70,15 @@ class MyApp extends StatelessWidget {
         UserSettingsPage.routeName: (context) => const UserSettingsPage(),
         UserListVehiclePage.routeName: (context) => const UserListVehiclePage(),
         // loaders
+        MainLoaderPage.routeName: (context) => const MainLoaderPage(),
         SwitchLoaderPage.routeName: (context) => const SwitchLoaderPage(),
         // seller pages
-        SellerHomePage.routeName: (context) => const SellerHomePage()
+        SellerHomePage.routeName: (context) => const SellerHomePage(),
+        SellerCalendarPage.routeName: (context) => const SellerCalendarPage(),
+        SellerMenuPage.routeName: (context) => const SellerMenuPage(),
+        SellerNotificationPage.routeName: (context) =>
+            const SellerNotificationPage(),
+        CreateVehiclePage.routeName: (context) => const CreateVehiclePage()
       },
     );
   }
@@ -86,7 +97,10 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // const CircularProgressIndicator(); // Show loading indicator while fetching tokens
-          return const Scaffold(body: CircularProgressIndicator());
+          return const Scaffold(
+              body: Center(
+            child: CircularProgressIndicator(),
+          ));
         }
         if (snapshot.hasError) {
           return Scaffold(
@@ -98,7 +112,8 @@ class MyApp extends StatelessWidget {
             tokens.containsKey('accessToken') &&
             tokens.containsKey('refreshToken')) {
           // Tokens are available, navigate to Home page
-          return const HomePage(); // Replace with logic based on tokens if needed
+          // return const HomePage(); // Replace with logic based on tokens if needed
+          return const MainLoaderPage();
         } else {
           // Tokens are not available or invalid, navigate to Login page
           return const LoginPage(); // Replace with logic based on tokens if needed

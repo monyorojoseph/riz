@@ -47,7 +47,7 @@ class RegisterForm extends HookWidget {
     return FormBuilder(
       key: _formKey,
       child: Column(
-        children: [
+        children: <Widget>[
           FormBuilderTextField(
             name: 'fullName',
             decoration: const InputDecoration(labelText: 'Full Name'),

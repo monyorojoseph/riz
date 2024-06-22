@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mobile/classes/auth.dart';
+import 'package:mobile/pages/loaders/mainpage.dart';
 import 'package:mobile/services/auth.dart';
 import 'package:mobile/utils/storage.dart';
 
@@ -21,17 +22,15 @@ class AuthVerificationPage extends StatelessWidget {
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
-          child: Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text("Token Auth Verification"),
-                const SizedBox(height: 10),
-                Text(
-                    "$fullName Auth token has been sent to your email, use it to login."),
-                AuthVerificationForm(email: args.email)
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text("Token Auth Verification"),
+              const SizedBox(height: 10),
+              Text(
+                  "$fullName Auth token has been sent to your email, use it to login."),
+              AuthVerificationForm(email: args.email)
+            ],
           ),
         ),
       ),
@@ -53,7 +52,7 @@ class AuthVerificationForm extends HookWidget {
 
     return FormBuilder(
       key: _formKey,
-      child: Column(
+      child: ListView(
         children: [
           FormBuilderTextField(
             name: 'token',
@@ -92,7 +91,8 @@ class AuthVerificationForm extends HookWidget {
                             debugPrint(allValues.toString());
 
                             if (context.mounted) {
-                              Navigator.pushNamed(context, '/');
+                              Navigator.pushNamed(
+                                  context, MainLoaderPage.routeName);
                             }
                           }
                         } catch (e) {

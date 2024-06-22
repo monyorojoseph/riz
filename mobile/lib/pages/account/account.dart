@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:http/http.dart';
 import 'package:mobile/pages/account/editprofile.dart';
 import 'package:mobile/pages/account/listvehicle.dart';
 import 'package:mobile/pages/account/usersettings.dart';
 import 'package:mobile/pages/account/verification.dart';
-import 'package:mobile/pages/auth/login.dart';
-import 'package:mobile/services/auth.dart';
 import 'package:mobile/services/user.dart';
-import 'package:mobile/utils/storage.dart';
+import 'package:mobile/widgets/auth/logout.dart';
 import 'package:mobile/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class AccountPage extends StatelessWidget {
@@ -25,7 +22,7 @@ class AccountPage extends StatelessWidget {
       )),
       body: Container(
           color: Colors.white,
-          child: Column(
+          child: ListView(
             children: <Widget>[
               const SizedBox(height: 100),
               const UserDetails(),
@@ -153,46 +150,6 @@ class UserDetails extends HookWidget {
           style: const TextStyle(fontSize: 12),
         )
       ],
-    );
-  }
-}
-
-class Logout extends StatelessWidget {
-  Logout({super.key});
-  final _storage = MyCustomSecureStorage();
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () async {
-        String? access = await _storage.read(key: "accessToken");
-        if (access != null) {
-          Response response = await logoutUser(access);
-          if (response.statusCode != 200) {
-            debugPrint("Failed to logout, on server");
-          }
-        }
-        await _storage.delete(key: "accessToken");
-        if (context.mounted) {
-          Navigator.pushNamed(context, LoginPage.routeName);
-        }
-      },
-      child: const Row(
-        children: <Widget>[
-          Icon(
-            Icons.logout_rounded,
-            color: Colors.redAccent,
-          ),
-          SizedBox(width: 20),
-          Text(
-            "Logout",
-            style: TextStyle(
-                color: Colors.redAccent,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
-          )
-        ],
-      ),
     );
   }
 }
