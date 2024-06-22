@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/bottomnavbaritems.dart';
+import 'package:mobile/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -10,7 +10,7 @@ class HistoryPage extends StatelessWidget {
     return const Scaffold(
       body: Text("Hello History"),
       bottomNavigationBar: BottomAppBar(
-          child: BottomNavbarItems(
+          child: ClientBottomNavbarItems(
         currentTab: routeName,
       )),
     );

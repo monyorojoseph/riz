@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional, Type
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
-from .models import User
+from .models import User, UserSetting
 
 """ User """
 SlimUserSchema = create_schema(User, fields=['email', 'fullName', 'id', 'verifiedEmail', 'verified'])
@@ -16,6 +16,11 @@ class MyTokenObtainPairOutSchema(Schema):
 
 class LogoutSchema(Schema):
     access: str
+
+
+UserSettingSchema = create_schema(UserSetting)
+UpdateUserSettingSchema = create_schema(UserSetting, fields=['appPurpose', 'currentScreen'], \
+                            optional_fields=['appPurpose', 'currentScreen'])
 
 # """ Shop """
 # class ShopSchemaIn(Schema):

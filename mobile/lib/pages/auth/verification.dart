@@ -49,6 +49,8 @@ class AuthVerificationForm extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = useState(false);
+
     return FormBuilder(
       key: _formKey,
       child: Column(
@@ -61,49 +63,56 @@ class AuthVerificationForm extends HookWidget {
             ]),
           ),
           const SizedBox(height: 30),
-          MaterialButton(
-            minWidth: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.symmetric(vertical: 7.5),
-            color: Colors.black,
-            onPressed: () async {
-              if (_formKey.currentState?.saveAndValidate() ?? false) {
-                // final context = myWidgetKey.currentContext;
-                final formData = _formKey.currentState?.value;
+          isLoading.value
+              ? const CircularProgressIndicator()
+              : MaterialButton(
+                  minWidth: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(vertical: 7.5),
+                  color: Colors.black,
+                  onPressed: () async {
+                    if (_formKey.currentState?.saveAndValidate() ?? false) {
+                      // final context = myWidgetKey.currentContext;
+                      final formData = _formKey.currentState?.value;
 
-                if (formData != null) {
-                  String token = formData['token'];
-                  try {
-                    AuthenticatedUser user = await getAuthTokens(token);
-                    if (user.refresh.isNotEmpty && user.access.isNotEmpty) {
-                      // save tokens
-                      await _storage.write(
-                          key: "refreshToken", value: user.refresh);
-                      await _storage.write(
-                          key: "accessToken", value: user.access);
+                      if (formData != null) {
+                        String token = formData['token'];
+                        try {
+                          isLoading.value = true;
+                          AuthenticatedUser user = await getAuthTokens(token);
+                          if (user.refresh.isNotEmpty &&
+                              user.access.isNotEmpty) {
+                            // save tokens
+                            await _storage.write(
+                                key: "refreshToken", value: user.refresh);
+                            await _storage.write(
+                                key: "accessToken", value: user.access);
 
-                      Map<String, String> allValues = await _storage.readAll();
-                      debugPrint(allValues.toString());
+                            Map<String, String> allValues =
+                                await _storage.readAll();
+                            debugPrint(allValues.toString());
 
-                      if (context.mounted) {
-                        Navigator.pushNamed(context, '/');
+                            if (context.mounted) {
+                              Navigator.pushNamed(context, '/');
+                            }
+                          }
+                        } catch (e) {
+                          debugPrint('Token Verifition failed: $e');
+                        } finally {
+                          isLoading.value = false;
+                        }
                       }
+                    } else {
+                      debugPrint('Validation failed');
                     }
-                  } catch (e) {
-                    debugPrint('Token Verifition failed: $e');
-                  }
-                }
-              } else {
-                debugPrint('Validation failed');
-              }
-            },
-            child: const Text(
-              'Submit',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            ),
-          ),
+                  },
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  ),
+                ),
         ],
       ),
     );

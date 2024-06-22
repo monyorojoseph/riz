@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:mobile/widgets/bottomnavbaritems.dart';
+import 'package:mobile/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class HomePage extends HookWidget {
   const HomePage({super.key});
@@ -11,7 +11,7 @@ class HomePage extends HookWidget {
     return const Scaffold(
       appBar: HomeAppBar(),
       bottomNavigationBar: BottomAppBar(
-          child: BottomNavbarItems(
+          child: ClientBottomNavbarItems(
         currentTab: routeName,
       )),
     );

@@ -14,8 +14,8 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 # from .utils import gen_shop_membeship_join_token
-from .models import User, UserAuthToken
-from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema,  UserSchema, UpdateUserSchema
+from .models import User, UserAuthToken, UserSetting
+from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema, UpdateUserSettingSchema,  UserSchema, UpdateUserSchema, UserSettingSchema
 from .tasks import send_email_auth_token
 
 
@@ -125,7 +125,7 @@ class UserAPI:
     def remove(self, request):
         user = request.user
         user.delete()
-        return
+        return 200
      
     # # user listed items
     # @route.get("items", response=List[ItemSchema])
@@ -178,6 +178,26 @@ class UserAPI:
         # return data
            
 api.register_controllers(UserAPI)
+
+@api_controller("user-settings/", tags=["User Setting"], auth= JWTAuth())
+class UserSettingsAPI: 
+    # get settings
+    @route.get(path="", response=UserSettingSchema)
+    def details(self, request):
+        return request.user.usersetting
+    
+    # update setting
+    @route.put(path="update", response=UserSettingSchema)
+    def change(self, request, data: UpdateUserSettingSchema):
+        print(data)
+        usersetting = request.user.usersetting
+        for attr, value in data.dict(exclude_unset=True).items():
+            if value is not None:
+                setattr(usersetting, attr, value)
+        usersetting.save()
+        return usersetting
+
+api.register_controllers(UserSettingsAPI)
 
 # """ SHOP Related APIs """
 # @api_controller("shop/", tags=["Shop"])

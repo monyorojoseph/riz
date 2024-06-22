@@ -3,12 +3,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mobile/pages/account/editprofile.dart';
+import 'package:mobile/pages/account/listvehicle.dart';
+import 'package:mobile/pages/account/usersettings.dart';
 import 'package:mobile/pages/account/verification.dart';
 import 'package:mobile/pages/auth/login.dart';
 import 'package:mobile/pages/auth/register.dart';
 import 'package:mobile/pages/auth/verification.dart';
 import 'package:mobile/pages/home/home.dart';
+import 'package:mobile/pages/loaders/switchpage.dart';
 import 'package:mobile/pages/notifications/notifications.dart';
+import 'package:mobile/pages/seller/home.dart';
 import 'package:mobile/utils/storage.dart';
 
 import 'pages/account/account.dart';
@@ -41,7 +45,7 @@ class MyApp extends StatelessWidget {
         ...FormBuilderLocalizations.supportedLocales
       ],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black12),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
       // initialRoute: LoginPage.routeName,
@@ -58,6 +62,12 @@ class MyApp extends StatelessWidget {
         ProfilePage.routeName: (context) => const ProfilePage(),
         UserVerificationPage.routeName: (context) =>
             const UserVerificationPage(),
+        UserSettingsPage.routeName: (context) => const UserSettingsPage(),
+        UserListVehiclePage.routeName: (context) => const UserListVehiclePage(),
+        // loaders
+        SwitchLoaderPage.routeName: (context) => const SwitchLoaderPage(),
+        // seller pages
+        SellerHomePage.routeName: (context) => const SellerHomePage()
       },
     );
   }

@@ -42,6 +42,8 @@ class RegisterForm extends HookWidget {
   final _formKey = GlobalKey<FormBuilderState>();
   @override
   Widget build(BuildContext context) {
+    final isLoading = useState(false);
+
     return FormBuilder(
       key: _formKey,
       child: Column(
@@ -73,47 +75,53 @@ class RegisterForm extends HookWidget {
             ]),
           ),
           const SizedBox(height: 30),
-          MaterialButton(
-            minWidth: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.symmetric(vertical: 7.5),
-            color: Colors.black,
-            onPressed: () async {
-              // _formKey.currentState?.saveAndValidate();
-              // debugPrint(_formKey.currentState?.value.toString());
+          isLoading.value
+              ? const CircularProgressIndicator()
+              : MaterialButton(
+                  minWidth: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(vertical: 7.5),
+                  color: Colors.black,
+                  onPressed: () async {
+                    // _formKey.currentState?.saveAndValidate();
+                    // debugPrint(_formKey.currentState?.value.toString());
 
-              if (_formKey.currentState?.saveAndValidate() ?? false) {
-                final formData = _formKey.currentState?.value;
-                if (formData != null) {
-                  String fullName = formData['fullName'];
-                  String email = formData['email'];
-                  String password = formData['password'];
-                  try {
-                    RegisterUser user =
-                        await registerUser(email, password, fullName);
-                    if (user.email.isNotEmpty && user.fullName.isNotEmpty) {
-                      if (context.mounted) {
-                        Navigator.pushNamed(
-                            context, AuthVerificationPage.routeName,
-                            arguments: AuthVerificationPageArgs(
-                                user.email, user.fullName));
+                    if (_formKey.currentState?.saveAndValidate() ?? false) {
+                      final formData = _formKey.currentState?.value;
+                      if (formData != null) {
+                        String fullName = formData['fullName'];
+                        String email = formData['email'];
+                        String password = formData['password'];
+                        try {
+                          isLoading.value = true;
+                          RegisterUser user =
+                              await registerUser(email, password, fullName);
+                          if (user.email.isNotEmpty &&
+                              user.fullName.isNotEmpty) {
+                            if (context.mounted) {
+                              Navigator.pushNamed(
+                                  context, AuthVerificationPage.routeName,
+                                  arguments: AuthVerificationPageArgs(
+                                      user.email, user.fullName));
+                            }
+                          }
+                        } catch (e) {
+                          debugPrint('Registration failed: $e');
+                        } finally {
+                          isLoading.value = false;
+                        }
                       }
+                    } else {
+                      debugPrint('Validation failed');
                     }
-                  } catch (e) {
-                    debugPrint('Registration failed: $e');
-                  }
-                }
-              } else {
-                debugPrint('Validation failed');
-              }
-            },
-            child: const Text(
-              'Register',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            ),
-          ),
+                  },
+                  child: const Text(
+                    'Register',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  ),
+                ),
           const SizedBox(height: 20),
           const Text("or"),
           const SizedBox(height: 10),

@@ -34,14 +34,14 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class User(AbstractBaseUser):
+class User(LifecycleModelMixin, AbstractBaseUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     fullName = models.CharField(max_length=200)
     email = models.EmailField(max_length=200, unique=True)
     verifiedEmail = models.BooleanField(default=False)
     phone = models.CharField(max_length=15)
 
-    MALE, FEMALE, NONE = 'ML', 'FML', 'None'
+    MALE, FEMALE, NONE = 'ML', 'FML', 'NN'
     SEX_CHOICES = [
         (MALE, 'Male'),
         (FEMALE, 'Female'),
@@ -75,6 +75,10 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+    
+    @hook(AFTER_CREATE, on_commit=True)
+    def create_user_settings(self):
+        user_setting = UserSetting.objects.create(user=self)
 
 class TokenBase(models.Model):
     token = models.CharField(unique=True, max_length=8)
@@ -105,6 +109,29 @@ class UserAuthToken(TokenBase):
 
     ]
     type = models.CharField(default=LOGIN, choices=CHOICES, max_length=5)
+
+class UserSetting(models.Model):
+    user = models.OneToOneField("User", on_delete=models.CASCADE, related_name='usersetting')
+
+    CLIENT = "CLT"
+    SELLER = "SLR"
+    BUSINESS = "BSN"
+
+    UserAppPurpose = [
+        (CLIENT, "User as Client"),
+        (SELLER, "User as normal seller"),
+    ]
+    appPurpose = models.CharField(default=CLIENT, choices=UserAppPurpose)
+    
+    CLIENT_SCREEN = "CSCRN"
+    SELLER_SCREEN = "SSCRN"
+
+    UserCurrentScreen = [
+        (CLIENT_SCREEN, "Client Screen"),
+        (SELLER_SCREEN, "Seller Screen"),
+    ]
+    currentScreen = models.CharField(default=CLIENT_SCREEN, choices=UserCurrentScreen)
+
 
 # class ShopMembershipRole(models.TextChoices):
 #     OWNER = "OR", _("Owner")

@@ -44,6 +44,8 @@ class LoginForm extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = useState(false);
+
     return FormBuilder(
       key: _formKey,
       child: Column(
@@ -66,44 +68,50 @@ class LoginForm extends HookWidget {
             ]),
           ),
           const SizedBox(height: 30),
-          MaterialButton(
-            minWidth: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.symmetric(vertical: 7.5),
-            color: Colors.black,
-            onPressed: () async {
-              if (_formKey.currentState?.saveAndValidate() ?? false) {
-                // final context = myWidgetKey.currentContext;
-                final formData = _formKey.currentState?.value;
+          isLoading.value
+              ? const CircularProgressIndicator()
+              : MaterialButton(
+                  minWidth: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(vertical: 7.5),
+                  color: Colors.black,
+                  onPressed: () async {
+                    if (_formKey.currentState?.saveAndValidate() ?? false) {
+                      // final context = myWidgetKey.currentContext;
+                      final formData = _formKey.currentState?.value;
 
-                if (formData != null) {
-                  String email = formData['email'];
-                  String password = formData['password'];
-                  try {
-                    LoginUser user = await loginUser(email, password);
-                    if (user.email.isNotEmpty && user.fullName.isNotEmpty) {
-                      if (context.mounted) {
-                        Navigator.pushNamed(
-                            context, AuthVerificationPage.routeName,
-                            arguments: AuthVerificationPageArgs(
-                                user.email, user.fullName));
+                      if (formData != null) {
+                        String email = formData['email'];
+                        String password = formData['password'];
+                        try {
+                          isLoading.value = true;
+                          LoginUser user = await loginUser(email, password);
+                          if (user.email.isNotEmpty &&
+                              user.fullName.isNotEmpty) {
+                            if (context.mounted) {
+                              Navigator.pushNamed(
+                                  context, AuthVerificationPage.routeName,
+                                  arguments: AuthVerificationPageArgs(
+                                      user.email, user.fullName));
+                            }
+                          }
+                        } catch (e) {
+                          debugPrint('Login failed: $e');
+                        } finally {
+                          isLoading.value = false;
+                        }
                       }
+                    } else {
+                      debugPrint('Validation failed');
                     }
-                  } catch (e) {
-                    debugPrint('Login failed: $e');
-                  }
-                }
-              } else {
-                debugPrint('Validation failed');
-              }
-            },
-            child: const Text(
-              'Login',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            ),
-          ),
+                  },
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  ),
+                ),
           const SizedBox(height: 20),
           const Text("or"),
           const SizedBox(height: 10),

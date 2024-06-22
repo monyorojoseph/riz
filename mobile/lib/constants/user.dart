@@ -1,0 +1,1 @@
+enum UserAppPurpose { clt, slr }

@@ -1,10 +1,10 @@
-// login
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:mobile/classes/auth.dart';
 
+// login
 Future<LoginUser> loginUser(String email, String password) async {
   final response = await http.post(
     Uri.parse('http://127.0.0.1:8000/auth/login'),

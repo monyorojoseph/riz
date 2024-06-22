@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/bottomnavbaritems.dart';
+import 'package:mobile/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
@@ -10,7 +10,7 @@ class NotificationsPage extends StatelessWidget {
     return const Scaffold(
       body: Text("Hello notification"),
       bottomNavigationBar: BottomAppBar(
-          child: BottomNavbarItems(
+          child: ClientBottomNavbarItems(
         currentTab: routeName,
       )),
     );
