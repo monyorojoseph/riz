@@ -29,7 +29,7 @@ class AuthVerificationPage extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                   "$fullName Auth token has been sent to your email, use it to login."),
-              AuthVerificationForm(email: args.email)
+              AuthVerificationForm(email: args.email),
             ],
           ),
         ),
@@ -50,70 +50,73 @@ class AuthVerificationForm extends HookWidget {
   Widget build(BuildContext context) {
     final isLoading = useState(false);
 
-    return FormBuilder(
-      key: _formKey,
-      child: ListView(
-        children: [
-          FormBuilderTextField(
-            name: 'token',
-            decoration: const InputDecoration(labelText: 'Token'),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(),
-            ]),
-          ),
-          const SizedBox(height: 30),
-          isLoading.value
-              ? const CircularProgressIndicator()
-              : MaterialButton(
-                  minWidth: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(vertical: 7.5),
-                  color: Colors.black,
-                  onPressed: () async {
-                    if (_formKey.currentState?.saveAndValidate() ?? false) {
-                      // final context = myWidgetKey.currentContext;
-                      final formData = _formKey.currentState?.value;
+    return SingleChildScrollView(
+      child: FormBuilder(
+        key: _formKey,
+        child: Column(
+          children: [
+            FormBuilderTextField(
+              name: 'token',
+              decoration: const InputDecoration(labelText: 'Token'),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(),
+              ]),
+            ),
+            const SizedBox(height: 30),
+            MaterialButton(
+              minWidth: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.symmetric(vertical: 7.5),
+              color: Colors.black,
+              onPressed: () async {
+                if (_formKey.currentState?.saveAndValidate() ?? false) {
+                  // final context = myWidgetKey.currentContext;
+                  final formData = _formKey.currentState?.value;
 
-                      if (formData != null) {
-                        String token = formData['token'];
-                        try {
-                          isLoading.value = true;
-                          AuthenticatedUser user = await getAuthTokens(token);
-                          if (user.refresh.isNotEmpty &&
-                              user.access.isNotEmpty) {
-                            // save tokens
-                            await _storage.write(
-                                key: "refreshToken", value: user.refresh);
-                            await _storage.write(
-                                key: "accessToken", value: user.access);
+                  if (formData != null) {
+                    String token = formData['token'];
+                    try {
+                      isLoading.value = true;
+                      AuthenticatedUser user = await getAuthTokens(token);
+                      if (user.refresh.isNotEmpty && user.access.isNotEmpty) {
+                        // save tokens
+                        await _storage.write(
+                            key: "refreshToken", value: user.refresh);
+                        await _storage.write(
+                            key: "accessToken", value: user.access);
 
-                            Map<String, String> allValues =
-                                await _storage.readAll();
-                            debugPrint(allValues.toString());
+                        // Map<String, String> allValues =
+                        //     await _storage.readAll();
+                        // debugPrint(allValues.toString());
 
-                            if (context.mounted) {
-                              Navigator.pushNamed(
-                                  context, MainLoaderPage.routeName);
-                            }
-                          }
-                        } catch (e) {
-                          debugPrint('Token Verifition failed: $e');
-                        } finally {
-                          isLoading.value = false;
+                        if (context.mounted) {
+                          Navigator.pushNamed(
+                              context, MainLoaderPage.routeName);
                         }
                       }
-                    } else {
-                      debugPrint('Validation failed');
+                    } catch (e) {
+                      debugPrint('Token Verifition failed: $e');
+                    } finally {
+                      isLoading.value = false;
                     }
-                  },
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                ),
-        ],
+                  }
+                } else {
+                  debugPrint('Validation failed');
+                }
+              },
+              child: isLoading.value
+                  ? const CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : const Text(
+                      'Submit',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

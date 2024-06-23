@@ -18,17 +18,15 @@ class LoginPage extends StatelessWidget {
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
-          child: Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Center(
-                  child: Text("Login"),
-                ),
-                const SizedBox(height: 50),
-                LoginForm()
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Center(
+                child: Text("Login"),
+              ),
+              const SizedBox(height: 50),
+              LoginForm()
+            ],
           ),
         ),
       ),
@@ -68,50 +66,52 @@ class LoginForm extends HookWidget {
             ]),
           ),
           const SizedBox(height: 30),
-          isLoading.value
-              ? const CircularProgressIndicator()
-              : MaterialButton(
-                  minWidth: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(vertical: 7.5),
-                  color: Colors.black,
-                  onPressed: () async {
-                    if (_formKey.currentState?.saveAndValidate() ?? false) {
-                      // final context = myWidgetKey.currentContext;
-                      final formData = _formKey.currentState?.value;
+          MaterialButton(
+            minWidth: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.symmetric(vertical: 7.5),
+            color: Colors.black,
+            onPressed: () async {
+              if (_formKey.currentState?.saveAndValidate() ?? false) {
+                // final context = myWidgetKey.currentContext;
+                final formData = _formKey.currentState?.value;
 
-                      if (formData != null) {
-                        String email = formData['email'];
-                        String password = formData['password'];
-                        try {
-                          isLoading.value = true;
-                          LoginUser user = await loginUser(email, password);
-                          if (user.email.isNotEmpty &&
-                              user.fullName.isNotEmpty) {
-                            if (context.mounted) {
-                              Navigator.pushNamed(
-                                  context, AuthVerificationPage.routeName,
-                                  arguments: AuthVerificationPageArgs(
-                                      user.email, user.fullName));
-                            }
-                          }
-                        } catch (e) {
-                          debugPrint('Login failed: $e');
-                        } finally {
-                          isLoading.value = false;
-                        }
+                if (formData != null) {
+                  String email = formData['email'];
+                  String password = formData['password'];
+                  try {
+                    isLoading.value = true;
+                    LoginUser user = await loginUser(email, password);
+                    if (user.email.isNotEmpty && user.fullName.isNotEmpty) {
+                      if (context.mounted) {
+                        debugPrint(user.fullName);
+                        Navigator.pushNamed(
+                            context, AuthVerificationPage.routeName,
+                            arguments: AuthVerificationPageArgs(
+                                user.email, user.fullName));
                       }
-                    } else {
-                      debugPrint('Validation failed');
                     }
-                  },
-                  child: const Text(
+                  } catch (e) {
+                    debugPrint('Login failed: $e');
+                  } finally {
+                    isLoading.value = false;
+                  }
+                }
+              } else {
+                debugPrint('Validation failed');
+              }
+            },
+            child: isLoading.value
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                : const Text(
                     'Login',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
-                ),
+          ),
           const SizedBox(height: 20),
           const Text("or"),
           const SizedBox(height: 10),

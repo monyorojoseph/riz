@@ -14,8 +14,9 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 # from .utils import gen_shop_membeship_join_token
-from .models import User, UserAuthToken, UserSetting, Vehicle
-from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema, UpdateUserSettingSchema,  UserSchema, UpdateUserSchema, UserSettingSchema, VehicleSchema
+from .models import User, UserAuthToken, UserSetting, Vehicle, VehicleBrand, VehicleModel
+from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema, UpdateUserSettingSchema \
+    ,UserSchema, UpdateUserSchema, UserSettingSchema, VehicleBrandSchema, VehicleModelSchema, VehicleSchema, VehicleSchemaIn
 from .tasks import send_email_auth_token
 
 
@@ -199,13 +200,40 @@ class UserSettingsAPI:
 
 api.register_controllers(UserSettingsAPI)
 
-""" VEHICLE Related APIs """
-# @api_controller("vehicle/", tags=["Vehicle"])
-# class VehicleAPI:
-#     # create 
-#     pass
 
-# api.register_controllers(VehicleAPI)
+""" BRAND & MODEL APIs """
+@api_controller("brand/", tags=["Brand and Models"])
+class BrandModelAPI:
+    # brands
+    @route.get("all", response=List[VehicleBrandSchema])
+    def brands(self, request):
+        brands = VehicleBrand.objects.all()
+        return brands
+    
+    # models
+    @route.get("models", response=List[VehicleModelSchema])
+    def models(self, request, brandId):
+        models = VehicleModel.objects.filter(brand_id=brandId)
+        return models
+
+api.register_controllers(BrandModelAPI)
+
+""" VEHICLE Related APIs """
+@api_controller("vehicle/", tags=["Vehicle"])
+class VehicleAPI:
+    # create 
+    @route.post(path="create", response=VehicleSchema, auth= JWTAuth())
+    def create(self, request, data: VehicleSchemaIn):
+        print(data)
+        vehicle = Vehicle.objects.create(**data.dict())
+        return vehicle
+    
+    @route.post(path="{str:id}/create-images", response=VehicleSchema, auth= JWTAuth())
+    def create_vehicle_images(self, request, id, files: File[list[UploadedFile]]):
+        vehicle = Vehicle.objects.get(id=id)
+        return 200
+
+api.register_controllers(VehicleAPI)
 
 
 # """ SHOP Related APIs """

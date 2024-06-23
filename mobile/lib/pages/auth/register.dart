@@ -75,53 +75,54 @@ class RegisterForm extends HookWidget {
             ]),
           ),
           const SizedBox(height: 30),
-          isLoading.value
-              ? const CircularProgressIndicator()
-              : MaterialButton(
-                  minWidth: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(vertical: 7.5),
-                  color: Colors.black,
-                  onPressed: () async {
-                    // _formKey.currentState?.saveAndValidate();
-                    // debugPrint(_formKey.currentState?.value.toString());
+          MaterialButton(
+            minWidth: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.symmetric(vertical: 7.5),
+            color: Colors.black,
+            onPressed: () async {
+              // _formKey.currentState?.saveAndValidate();
+              // debugPrint(_formKey.currentState?.value.toString());
 
-                    if (_formKey.currentState?.saveAndValidate() ?? false) {
-                      final formData = _formKey.currentState?.value;
-                      if (formData != null) {
-                        String fullName = formData['fullName'];
-                        String email = formData['email'];
-                        String password = formData['password'];
-                        try {
-                          isLoading.value = true;
-                          RegisterUser user =
-                              await registerUser(email, password, fullName);
-                          if (user.email.isNotEmpty &&
-                              user.fullName.isNotEmpty) {
-                            if (context.mounted) {
-                              Navigator.pushNamed(
-                                  context, AuthVerificationPage.routeName,
-                                  arguments: AuthVerificationPageArgs(
-                                      user.email, user.fullName));
-                            }
-                          }
-                        } catch (e) {
-                          debugPrint('Registration failed: $e');
-                        } finally {
-                          isLoading.value = false;
-                        }
+              if (_formKey.currentState?.saveAndValidate() ?? false) {
+                final formData = _formKey.currentState?.value;
+                if (formData != null) {
+                  String fullName = formData['fullName'];
+                  String email = formData['email'];
+                  String password = formData['password'];
+                  try {
+                    isLoading.value = true;
+                    RegisterUser user =
+                        await registerUser(email, password, fullName);
+                    if (user.email.isNotEmpty && user.fullName.isNotEmpty) {
+                      if (context.mounted) {
+                        Navigator.pushNamed(
+                            context, AuthVerificationPage.routeName,
+                            arguments: AuthVerificationPageArgs(
+                                user.email, user.fullName));
                       }
-                    } else {
-                      debugPrint('Validation failed');
                     }
-                  },
-                  child: const Text(
+                  } catch (e) {
+                    debugPrint('Registration failed: $e');
+                  } finally {
+                    isLoading.value = false;
+                  }
+                }
+              } else {
+                debugPrint('Validation failed');
+              }
+            },
+            child: isLoading.value
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                  )
+                : const Text(
                     'Register',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
-                ),
+          ),
           const SizedBox(height: 20),
           const Text("or"),
           const SizedBox(height: 10),

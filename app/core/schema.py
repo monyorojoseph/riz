@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional, Type
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
-from .models import User, UserSetting, Vehicle, VehicleImage
+from .models import User, UserSetting, Vehicle, VehicleImage, VehicleBrand, VehicleModel
 
 """ User """
 SlimUserSchema = create_schema(User, fields=['email', 'fullName', 'id', 'verifiedEmail', 'verified'])
@@ -24,15 +24,28 @@ UpdateUserSettingSchema = create_schema(UserSetting, fields=['appPurpose', 'curr
 
 
 """ Vehicle """
+VehicleBrandSchema = create_schema(VehicleBrand)
+VehicleModelSchema = create_schema(VehicleModel)
+
+
 VehicleImageSchema = create_schema(VehicleImage, fields=['id', 'image', 'coverImage'])
 VehicleSchema = create_schema(
     model=Vehicle, 
-    fields=['id', 'modelName', 'brandName', 'yom', 'category', 'contentType', 'contentId', 'display',
+    fields=['id', 'model', 'brand', 'yom', 'category', 'contentType', 'contentId', 'display',
             'createdOn', 'updatedOn'],
     custom_fields=[
         ('images', list[VehicleImageSchema], []),
         ('seller', Optional[SlimUserSchema], None),
     ])
+
+class VehicleSchemaIn(Schema):
+    model: str
+    brand: str
+    category: str
+    yom: str = None
+    seller_id: str = None
+    # shop_id: str = None
+
 
 # """ Shop """
 # class ShopSchemaIn(Schema):

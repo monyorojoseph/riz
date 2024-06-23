@@ -137,10 +137,24 @@ class VehicleTypes(models.TextChoices):
     WATER = "WTR", _("Watercraft")
     AIR = "AIR", _("Aircraft")
 
+class VehicleBrand(models.Model):
+    name = models.CharField(max_length=100)
+    category = models.CharField(default=VehicleTypes.LAND, choices=VehicleTypes.choices, max_length=3)
+
+    class Meta:
+        ordering = ["name"]
+
+class VehicleModel(models.Model):
+    name = models.CharField(max_length=100)
+    brand = models.ForeignKey('VehicleBrand', related_name='models', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["name"]
+
 class Vehicle(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    modelName = models.CharField(max_length=200)
-    brandName = models.CharField(max_length=200)
+    model = models.ForeignKey('VehicleModel', related_name='vehicles', on_delete=models.DO_NOTHING, null=True)
+    brand = models.ForeignKey('VehicleBrand', related_name='vehicles', on_delete=models.DO_NOTHING, null=True)
     yom = models.CharField(max_length=6, null=True)
     category = models.CharField(default=VehicleTypes.LAND, choices=VehicleTypes.choices, max_length=3)
     
@@ -156,7 +170,7 @@ class Vehicle(models.Model):
     updatedOn = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.brandName} {self.modelName}" 
+        return f"{self.brand} {self.model}" 
 
 class VehicleImage(models.Model):
     vehicle = models.ForeignKey('Vehicle', related_name='images', on_delete=models.CASCADE)
