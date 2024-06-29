@@ -66,7 +66,7 @@ class ClientBottomNavbarItems extends HookWidget {
           icon: const Icon(Icons.swap_horiz_outlined, size: 40),
           onPressed: () {
             Navigator.pushNamed(context, SwitchLoaderPage.routeName,
-                arguments: SwitchLoaderPageArgs('SLR'));
+                arguments: SwitchLoaderPageArgs('SSCRN'));
           },
         ),
       );

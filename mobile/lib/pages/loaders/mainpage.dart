@@ -15,14 +15,13 @@ class MainLoaderPage extends HookWidget {
 
     // Use useEffect to perform side-effects (like navigation) when usersetting changes
     useEffect(() {
-      if (usersetting.data?.currentScreen == "CLT") {
+      if (usersetting.data?.currentScreen == "CSCRN") {
         navigateToHomePage(context);
-      } else if (usersetting.data?.currentScreen == "SLR") {
+      } else if (usersetting.data?.currentScreen == "SSCRN") {
         navigateToSellerHomePage(context);
       }
       return null;
     }, [usersetting]);
-
     return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),

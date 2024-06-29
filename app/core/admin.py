@@ -1,9 +1,13 @@
 from django.contrib import admin
-from core.models import LandVehicle, Pricing, User, Vehicle, VehicleImage
+from core.models import LandVehicle, Pricing, User, UserSetting, Vehicle, VehicleImage
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ['fullName', 'email', 'phone', 'verifiedEmail']
+
+@admin.register(UserSetting)
+class UserSettingAdmin(admin.ModelAdmin):
+    list_display = ['user']
 
 
 @admin.register(Vehicle)

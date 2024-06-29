@@ -42,7 +42,7 @@ class SwitchLoaderPage extends HookWidget {
             );
           }
 
-          if (usersetting.currentScreen == "SLR") {
+          if (usersetting.currentScreen == "SSCRN") {
             Navigator.push(
               context,
               PageRouteBuilder(

@@ -70,7 +70,7 @@ class SellerBottomNavbarItems extends HookWidget {
             icon: const Icon(Icons.swap_horiz_outlined, size: 40),
             onPressed: () {
               Navigator.pushNamed(context, SwitchLoaderPage.routeName,
-                  arguments: SwitchLoaderPageArgs('CLT'));
+                  arguments: SwitchLoaderPageArgs('CSCRN'));
             }),
       );
     }
