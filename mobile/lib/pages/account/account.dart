@@ -125,7 +125,6 @@ class UserDetails extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final user = useQuery(['userDetails'], getUserDetails);
-
     return Column(
       children: <Widget>[
         const CircleAvatar(

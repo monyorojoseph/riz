@@ -14,9 +14,9 @@ class SlimUser {
 
   factory SlimUser.fromJson(Map<String, dynamic> json) {
     return SlimUser(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      fullName: json['fullName'] as String,
+      id: json['id'].toString(),
+      email: json['email'].toString(),
+      fullName: json['fullName'].toString(),
       verifiedEmail: json['verifiedEmail'] as bool,
       verified: json['verified'] as bool,
     );
@@ -48,15 +48,15 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      fullName: json['fullName'] as String,
+      id: json['id'].toString(),
+      email: json['email'].toString(),
+      fullName: json['fullName'].toString(),
       verifiedEmail: json['verifiedEmail'] as bool,
       verified: json['verified'] as bool,
-      phone: json['phone'] as String,
-      sex: json['sex'] as String,
-      profilePicture: json['profilePicture'] as String,
-      joinedOn: DateTime.parse(json['joinedOn'] as String),
+      phone: json['phone'].toString(),
+      sex: json['sex'].toString(),
+      profilePicture: json['profilePicture'].toString(),
+      joinedOn: DateTime.parse(json['joinedOn'].toString()),
     );
   }
 }
@@ -71,10 +71,10 @@ class UpdateUser {
 
   // factory UpdateUser.fromJson(Map<String, dynamic> json) {
   //   return UpdateUser(
-  //     email: json['email'] as String,
-  //     fullName: json['fullName'] as String,
-  //     phone: json['phone'] as String,
-  //     sex: json['sex'] as String,
+  //     email: json['email'].toString(),
+  //     fullName: json['fullName'].toString(),
+  //     phone: json['phone'].toString(),
+  //     sex: json['sex'].toString(),
   //   );
   // }
 
@@ -121,8 +121,8 @@ class UpdateUserSetting {
 
   factory UpdateUserSetting.fromJson(Map<String, dynamic> json) {
     return UpdateUserSetting(
-      appPurpose: json['appPurpose'] as String,
-      currentScreen: json['currentScreen'] as String,
+      appPurpose: json['appPurpose'].toString(),
+      currentScreen: json['currentScreen'].toString(),
     );
   }
   Map<String, dynamic> toJson() {

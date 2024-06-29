@@ -27,7 +27,7 @@ class SwitchLoaderPage extends HookWidget {
             ['userSettingDetails'], (previous) => usersetting);
 
         if (context.mounted) {
-          if (usersetting.currentScreen == "CLT") {
+          if (usersetting.currentScreen == "CSCRN") {
             Navigator.push(
               context,
               PageRouteBuilder(

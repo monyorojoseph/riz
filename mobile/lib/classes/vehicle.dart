@@ -11,8 +11,8 @@ class VehicleBrand {
   factory VehicleBrand.fromJson(Map<String, dynamic> json) {
     return VehicleBrand(
       id: json['id'] as num,
-      name: json['name'] as String,
-      category: json['category'] as String,
+      name: json['name'].toString(),
+      category: json['category'].toString(),
     );
   }
 }
@@ -28,7 +28,7 @@ class VehicleModel {
   factory VehicleModel.fromJson(Map<String, dynamic> json) {
     return VehicleModel(
       id: json['id'] as num,
-      name: json['name'] as String,
+      name: json['name'].toString(),
       brand: json['brand'] as num,
     );
   }
@@ -68,14 +68,15 @@ class Vehicle {
         ?.map((img) => VehicleImage.fromJson(img as Map<String, dynamic>))
         .toList();
     return Vehicle(
-        id: json['id'] as String,
+        id: json['id'].toString(),
         model: VehicleModel.fromJson(json['model'] as Map<String, dynamic>),
         brand: VehicleBrand.fromJson(json['brand'] as Map<String, dynamic>),
-        category: json['category'] as String,
+        category: json['category'].toString(),
         display: json['display'] as bool,
-        yom: json['yom'] != null ? DateTime.parse(json['yom'] as String) : null,
-        createdOn: DateTime.parse(json['createdOn'] as String),
-        updatedOn: DateTime.parse(json['updatedOn'] as String),
+        yom:
+            json['yom'] != null ? DateTime.parse(json['yom'].toString()) : null,
+        createdOn: DateTime.parse(json['createdOn'].toString()),
+        updatedOn: DateTime.parse(json['updatedOn'].toString()),
         seller: json['seller'] != null
             ? SlimUser.fromJson(json['seller'] as Map<String, dynamic>)
             : null,
@@ -94,7 +95,7 @@ class VehicleImage {
   factory VehicleImage.fromJson(Map<String, dynamic> json) {
     return VehicleImage(
         id: json['id'] as int,
-        image: json['image'] as String,
+        image: json['image'].toString(),
         coverImage: json['coverImage'] as bool);
   }
 }
@@ -126,15 +127,15 @@ class LandVehicle {
   factory LandVehicle.fromJson(Map<String, dynamic> json) {
     return LandVehicle(
         id: json['id'] as int,
-        engineType: json['engineType'] as String,
+        engineType: json['engineType'].toString(),
         engineSize: json['engineSize'] as int,
         passengers: json['passengers'] as int,
         load: json['load'] as int,
         doors: json['doors'] as int,
-        drivetrain: json['drivetrain'] as String,
-        fuelType: json['fuelType'] as String,
-        transmission: json['transmission'] as String,
-        type: json['type'] as String);
+        drivetrain: json['drivetrain'].toString(),
+        fuelType: json['fuelType'].toString(),
+        transmission: json['transmission'].toString(),
+        type: json['type'].toString());
   }
 
   // Map<String, dynamic> toJson() {
@@ -163,8 +164,8 @@ class VehicleVerificationOverview {
 
   factory VehicleVerificationOverview.fromJson(Map<String, dynamic> json) {
     return VehicleVerificationOverview(
-        message: json['message'] as String,
+        message: json['message'].toString(),
         passed: json['passed'] as bool,
-        stage: json['stage'] as String);
+        stage: json['stage'].toString());
   }
 }

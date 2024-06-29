@@ -11,8 +11,8 @@ class LoginUser {
 
   factory LoginUser.fromJson(Map<String, dynamic> json) {
     return LoginUser(
-      email: json['email'] as String,
-      fullName: json['fullName'] as String,
+      email: json['email'].toString(),
+      fullName: json['fullName'].toString(),
     );
   }
 }
@@ -30,9 +30,9 @@ class RegisterUser {
 
   factory RegisterUser.fromJson(Map<String, dynamic> json) {
     return RegisterUser(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      fullName: json['fullName'] as String,
+      id: json['id'].toString(),
+      email: json['email'].toString(),
+      fullName: json['fullName'].toString(),
     );
   }
 }
@@ -47,8 +47,8 @@ class AuthenticatedUser {
 
   factory AuthenticatedUser.fromJson(Map<String, dynamic> json) {
     return AuthenticatedUser(
-        refresh: json['refresh'] as String,
-        access: json['access'] as String,
+        refresh: json['refresh'].toString(),
+        access: json['access'].toString(),
         user: SlimUser.fromJson(json['user'] as Map<String, dynamic>));
   }
 }

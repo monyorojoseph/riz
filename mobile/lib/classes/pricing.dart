@@ -13,7 +13,7 @@ class Pricing {
     return Pricing(
         id: json['id'] as int,
         amount: json['amount'] as int,
-        period: json['period'] as String,
-        vehicle: json['vehicle'] as String);
+        period: json['period'].toString(),
+        vehicle: json['vehicle'].toString());
   }
 }
