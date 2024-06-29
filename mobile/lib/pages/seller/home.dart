@@ -8,6 +8,7 @@ import 'package:mobile/classes/utils.dart';
 import 'package:mobile/classes/vehicle.dart';
 import 'package:mobile/pages/seller/vehicle/create.dart';
 import 'package:mobile/pages/seller/vehicle/editvehicle.dart';
+import 'package:mobile/services/url.dart';
 import 'package:mobile/services/user.dart';
 import 'package:mobile/services/utils.dart';
 import 'package:mobile/services/vehicle.dart';
@@ -126,7 +127,7 @@ class VehicleListing extends HookWidget {
       onLongPress: () async {
         bg.value = Colors.greenAccent;
         final response = await genericGet(
-            true, 'http://127.0.0.1:8000/vehicle/${vehicle.id}/enable-display');
+            true, '$baseUrl/vehicle/${vehicle.id}/enable-display');
         if (response.statusCode == 200) {
           bg.value = Colors.white;
 

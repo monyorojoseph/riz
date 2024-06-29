@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:http/http.dart';
 import 'package:mobile/classes/vehicle.dart';
+import 'package:mobile/services/url.dart';
 import 'package:mobile/services/utils.dart';
 import 'package:image_picker/image_picker.dart';
 
 // vehicle brand
 Future<List<VehicleBrand>> getVehicleBrands() async {
-  final response = await genericGet(true, 'http://127.0.0.1:8000/brand/all');
+  final response = await genericGet(true, '$baseUrl/brand/all');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -20,8 +20,8 @@ Future<List<VehicleBrand>> getVehicleBrands() async {
 
 // vehicle models
 Future<List<VehicleModel>> getVehicleModels(String brandId) async {
-  final response = await genericGet(
-      true, 'http://127.0.0.1:8000/brand/models?brandId=$brandId');
+  final response =
+      await genericGet(true, '$baseUrl/brand/models?brandId=$brandId');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -35,8 +35,7 @@ Future<List<VehicleModel>> getVehicleModels(String brandId) async {
 
 // list vehicle
 Future<Vehicle> listVehicle(Map<String, dynamic> data) async {
-  final response =
-      await genericPost(true, 'http://127.0.0.1:8000/vehicle/create', data);
+  final response = await genericPost(true, '$baseUrl/vehicle/create', data);
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -50,8 +49,8 @@ Future<Vehicle> listVehicle(Map<String, dynamic> data) async {
 
 Future<LandVehicle> createLandVehicle(
     String vehicleId, Map<String, dynamic> data) async {
-  final response = await genericPost(
-      true, 'http://127.0.0.1:8000/land-vehicle/$vehicleId/create', data);
+  final response =
+      await genericPost(true, '$baseUrl/land-vehicle/$vehicleId/create', data);
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -64,8 +63,7 @@ Future<LandVehicle> createLandVehicle(
 // listed vehicle details
 // my listed vehicles
 Future<List<Vehicle>> myListedtVehicleModels() async {
-  final response =
-      await genericGet(true, 'http://127.0.0.1:8000/user/vehicles');
+  final response = await genericGet(true, '$baseUrl/user/vehicles');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -84,8 +82,8 @@ Future<List<Vehicle>> myListedtVehicleModels() async {
 
 Future<List<VehicleVerificationOverview>> vehicleVerificationOverview(
     String id) async {
-  final response = await genericGet(
-      true, 'http://127.0.0.1:8000/vehicle/$id/verification-overview');
+  final response =
+      await genericGet(true, '$baseUrl/vehicle/$id/verification-overview');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);

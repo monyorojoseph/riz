@@ -6,6 +6,7 @@ import 'package:image_field/linear_progress_indicator_if.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/classes/vehicle.dart';
 import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/services/url.dart';
 import 'package:mobile/services/utils.dart';
 
 // typedef Progress = Function(double percent);
@@ -80,8 +81,7 @@ class CreateVehicleImages extends HookWidget {
                   String? vId = vehicle.value?.id;
                   if (vId?.isNotEmpty ?? false) {
                     isLoading.value = true;
-                    String url =
-                        'http://127.0.0.1:8000/vehicle/$vId/create-images';
+                    String url = '$baseUrl/vehicle/$vId/create-images';
                     StreamedResponse streamResponse =
                         await uploadImages(url, pickedFiles.value!);
                     isLoading.value = false;

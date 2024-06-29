@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:mobile/classes/user.dart';
+import 'package:mobile/services/url.dart';
 import 'package:mobile/services/utils.dart';
 
 // user ( slim )
 Future<SlimUser> getSlimUser() async {
-  final response = await genericGet(true, 'http://127.0.0.1:8000/user/slim');
+  final response = await genericGet(true, '$baseUrl/user/slim');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -17,7 +18,7 @@ Future<SlimUser> getSlimUser() async {
 
 // user
 Future<User> getUserDetails() async {
-  final response = await genericGet(true, 'http://127.0.0.1:8000/user/details');
+  final response = await genericGet(true, '$baseUrl/user/details');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -29,8 +30,7 @@ Future<User> getUserDetails() async {
 
 // update user
 Future<User> updateUserDetails(UpdateUser data) async {
-  final response =
-      await genericPut('http://127.0.0.1:8000/user/update', data.toJson());
+  final response = await genericPut('$baseUrl/user/update', data.toJson());
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -47,8 +47,7 @@ Future<User> updateUserDetails(UpdateUser data) async {
 // user settings
 // user settings (details)
 Future<UserSetting> getUserSettingDetails() async {
-  final response =
-      await genericGet(true, 'http://127.0.0.1:8000/user-settings/');
+  final response = await genericGet(true, '$baseUrl/user-settings/');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -60,8 +59,8 @@ Future<UserSetting> getUserSettingDetails() async {
 
 // user settings (update)
 Future<UserSetting> updateUserSettingDetails(UpdateUserSetting data) async {
-  final response = await genericPut(
-      'http://127.0.0.1:8000/user-settings/update', data.toJson());
+  final response =
+      await genericPut('$baseUrl/user-settings/update', data.toJson());
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
