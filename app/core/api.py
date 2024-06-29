@@ -14,9 +14,9 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 # from .utils import gen_shop_membeship_join_token
-from .models import User, UserAuthToken, UserSetting, Vehicle, VehicleBrand, VehicleModel
-from .schema import Error, LogoutSchema, MyTokenObtainPairOutSchema, SlimUserSchema, UpdateUserSettingSchema \
-    ,UserSchema, UpdateUserSchema, UserSettingSchema, VehicleBrandSchema, VehicleModelSchema, VehicleSchema, VehicleSchemaIn
+from .models import LandVehicle, Pricing, User, UserAuthToken, UserSetting, Vehicle, VehicleBrand, VehicleImage, VehicleModel
+from .schema import Error, LandVehicleShema, LandVehicleShemaIn, LogoutSchema, MyTokenObtainPairOutSchema, OverviewMessage, PricingSchema, PricingSchemaIn, SlimUserSchema, UpdateUserSettingSchema \
+    ,UserSchema, UpdateUserSchema, UserSettingSchema, VehicleBrandSchema, VehicleModelSchema, VehicleSchema, VehicleSchemaIn 
 from .tasks import send_email_auth_token
 
 
@@ -228,12 +228,102 @@ class VehicleAPI:
         vehicle = Vehicle.objects.create(**data.dict())
         return vehicle
     
-    @route.post(path="{str:id}/create-images", response=VehicleSchema, auth= JWTAuth())
+    # create vehicle images
+    @route.post(path="{str:id}/create-images", response=VehicleSchema, auth=JWTAuth())
     def create_vehicle_images(self, request, id, files: File[list[UploadedFile]]):
         vehicle = Vehicle.objects.get(id=id)
-        return 200
+        imgs = [ VehicleImage(vehicle=vehicle, image=file) for file in files ]
+        VehicleImage.objects.bulk_create(imgs)
+        return vehicle
+    
+    # enable display
+    @route.get("{str:id}/enable-display", response={200: VehicleSchema, codes_4xx: Error }, auth=JWTAuth())
+    def enable_display(self, request, id):
+        vehicle = Vehicle.objects.prefetch_related("images", "prices").get(id=id)
+        # user is verified
+        user = request.user
+        if not user.verified:
+            return 400, {"detail": "You need to be verified first"}
+
+        # vehicle has images
+        if vehicle.images.count() < 3:            
+            return 400, {"detail": "You need to post atleast 2 pictures"}
+
+        # vehicle has prices
+        print(vehicle.prices.count())
+        if vehicle.prices.count() == 0:            
+            return 400, {"detail": "You need to create pricing for your vehicle"}
+
+        # TODO vehicle rules to clients
+        # vehicle has rules
+        vehicle.display = True
+        vehicle.save()
+        return vehicle
+
+    # overview or verification to display
+    @route.get("{str:id}/verification-overview", response=List[OverviewMessage], auth=JWTAuth())
+    def verification_overview(self, request, id):
+        vehicle = Vehicle.objects.prefetch_related("images").get(id=id)
+        data = []
+        # user is verified
+        user = request.user
+        userStageData = {"stage": "user", "message": "User Account Not Verified", "passed": False }
+        if user.verified:
+            userStageData['message'] = "User Account Verified"
+            userStageData['passed'] = True
+        data.append(userStageData)
+
+        # vehicle has images
+        imagesStageData = {"stage": "images", "message": "Your vehicle needs images to attract clients", "passed": False }
+        if vehicle.images.count() > 3:
+            imagesStageData["message"] = "You have posted vehicle images"
+            imagesStageData["passed"] = True
+        data.append(imagesStageData)
+
+        # vehicle has prices
+        pricingStageData = {"stage": "price", "message": "You need to have atleast one pricing Structure.", "passed": False }
+        if vehicle.prices.count() > 0:
+            pricingStageData["message"] = "You have added pricing structure"
+            pricingStageData["passed"] = True
+        data.append(pricingStageData)
+
+        # TODO vehicle rules to clients
+        # vehicle has rules
+        return data
+
+
 
 api.register_controllers(VehicleAPI)
+
+# land vehicle
+@api_controller("land-vehicle/", tags=["Land Vehicle"], auth=JWTAuth())
+class LandVehicleAPI:
+    # create
+    @route.post("{str:vehicleId}/create", response=LandVehicleShema)
+    def create(self, request, vehicleId, data: LandVehicleShemaIn):
+        landvehicle = LandVehicle.objects.create(**data.dict())
+
+        vehicle = Vehicle.objects.get(id=vehicleId)
+        vehicle.contentObject = ContentType.objects.get_for_model(landvehicle)
+        vehicle.contentId = landvehicle.id
+        vehicle.save()
+        return landvehicle
+    # update
+
+
+api.register_controllers(LandVehicleAPI)
+
+
+""" PRICING and Related APIs """
+@api_controller("vehicle-pricing/", tags=["Vehicle Pricing"], auth=JWTAuth())
+class PricingAPI:
+    # create
+    @route.post("create", response=PricingSchema)
+    def create(self, request, data: PricingSchemaIn):
+        pricing = Pricing.objects.create(**data.dict())
+        return pricing
+
+api.register_controllers(PricingAPI)
 
 
 # """ SHOP Related APIs """

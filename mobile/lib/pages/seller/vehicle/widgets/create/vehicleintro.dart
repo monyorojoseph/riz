@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:mobile/pages/seller/vehicle/create.dart';
 
 class CreateVehicleIntro extends HookWidget {
-  final ValueNotifier<String> currentPage;
+  final ValueNotifier<CreateSteps> currentPage;
   const CreateVehicleIntro({super.key, required this.currentPage});
 
   @override
@@ -81,7 +82,7 @@ class CreateVehicleIntro extends HookWidget {
           padding: const EdgeInsets.symmetric(vertical: 7.5),
           color: Colors.black,
           onPressed: () {
-            currentPage.value = "BASIC";
+            currentPage.value = CreateSteps.basic;
           },
           child: const Text(
             'Start',

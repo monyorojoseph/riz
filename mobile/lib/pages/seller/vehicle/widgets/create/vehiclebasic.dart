@@ -3,15 +3,22 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
+import 'package:mobile/classes/vehicle.dart';
+import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/services/user.dart';
 import 'package:mobile/services/vehicle.dart';
 
 class CreateVehicleBasic extends HookWidget {
-  final ValueNotifier<String> currentPage;
-  CreateVehicleBasic({super.key, required this.currentPage});
+  final ValueNotifier<CreateSteps> currentPage;
+  final ValueNotifier<Vehicle?> vehicle;
+  CreateVehicleBasic(
+      {super.key, required this.currentPage, required this.vehicle});
   final _formKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = useState<bool>(false);
+    final user = useQuery(['userDetails'], getUserDetails);
     final vehicleBrands = useQuery(['vehicleBrands'], getVehicleBrands);
     final selectedBrand = useState<String?>(null);
     final vehicleModels = useQuery(
@@ -103,16 +110,20 @@ class CreateVehicleBasic extends HookWidget {
 
                         if (formData != null) {
                           final data = {
-                            "brand": formData['brand'].toString(),
-                            "model": formData['model'].toString(),
+                            "brand_id": formData['brand'].toString(),
+                            "model_id": formData['model'].toString(),
+                            "seller_id": user.data?.id,
                             "category": "LND",
                             "yom": (formData['yom'] as DateTime).toString(),
                           };
 
                           debugPrint(data.toString());
                           try {
-                            final vehicle = await listVehicle(data);
-                            currentPage.value = "IMAGES";
+                            isLoading.value = true;
+                            final newVehicle = await listVehicle(data);
+                            isLoading.value = false;
+                            vehicle.value = newVehicle;
+                            currentPage.value = CreateSteps.details;
                           } catch (e) {
                             // Handle error
                             debugPrint('Failed to list vehicle: $e');
@@ -121,9 +132,9 @@ class CreateVehicleBasic extends HookWidget {
                         }
                       }
                     },
-                    child: const Text(
-                      'Next',
-                      style: TextStyle(
+                    child: Text(
+                      isLoading.value ? "Hold" : 'Next',
+                      style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 18),

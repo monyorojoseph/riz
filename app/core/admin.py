@@ -1,3 +1,25 @@
 from django.contrib import admin
+from core.models import LandVehicle, Pricing, User, Vehicle, VehicleImage
 
-# Register your models here.
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ['fullName', 'email', 'phone', 'verifiedEmail']
+
+
+@admin.register(Vehicle)
+class VehicleAdmin(admin.ModelAdmin):
+    list_display = ['brand', 'model', 'yom', 'category']
+
+@admin.register(VehicleImage)
+class VehicleImageAdmin(admin.ModelAdmin):
+    list_display = ['vehicle']
+
+
+@admin.register(LandVehicle)
+class LandVehicleAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Pricing)
+class PricingAdmin(admin.ModelAdmin):
+    pass

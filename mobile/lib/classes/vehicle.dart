@@ -36,8 +36,8 @@ class VehicleModel {
 
 class Vehicle {
   final String id;
-  final String model;
-  final String brand;
+  final VehicleModel model;
+  final VehicleBrand brand;
   final DateTime? yom;
   final String category;
   final String? contentType;
@@ -61,13 +61,110 @@ class Vehicle {
       required this.updatedOn,
       this.images,
       this.seller});
+
+  factory Vehicle.fromJson(Map<String, dynamic> json) {
+    var imagesJson = json['images'] as List<dynamic>?;
+    List<VehicleImage>? images = imagesJson
+        ?.map((img) => VehicleImage.fromJson(img as Map<String, dynamic>))
+        .toList();
+    return Vehicle(
+        id: json['id'] as String,
+        model: VehicleModel.fromJson(json['model'] as Map<String, dynamic>),
+        brand: VehicleBrand.fromJson(json['brand'] as Map<String, dynamic>),
+        category: json['category'] as String,
+        display: json['display'] as bool,
+        yom: json['yom'] != null ? DateTime.parse(json['yom'] as String) : null,
+        createdOn: DateTime.parse(json['createdOn'] as String),
+        updatedOn: DateTime.parse(json['updatedOn'] as String),
+        seller: json['seller'] != null
+            ? SlimUser.fromJson(json['seller'] as Map<String, dynamic>)
+            : null,
+        images: images);
+  }
 }
 
 class VehicleImage {
-  final String id;
+  final int id;
   final String image;
   final bool coverImage;
 
   VehicleImage(
       {required this.id, required this.image, required this.coverImage});
+
+  factory VehicleImage.fromJson(Map<String, dynamic> json) {
+    return VehicleImage(
+        id: json['id'] as int,
+        image: json['image'] as String,
+        coverImage: json['coverImage'] as bool);
+  }
+}
+
+class LandVehicle {
+  final int id;
+  final String engineType;
+  final int engineSize;
+  final int? doors;
+  final int passengers;
+  final int load;
+  final String fuelType;
+  final String transmission;
+  final String? drivetrain;
+  final String type;
+
+  LandVehicle(
+      {required this.id,
+      required this.engineType,
+      required this.engineSize,
+      this.doors,
+      required this.passengers,
+      required this.load,
+      this.drivetrain,
+      required this.fuelType,
+      required this.transmission,
+      required this.type});
+
+  factory LandVehicle.fromJson(Map<String, dynamic> json) {
+    return LandVehicle(
+        id: json['id'] as int,
+        engineType: json['engineType'] as String,
+        engineSize: json['engineSize'] as int,
+        passengers: json['passengers'] as int,
+        load: json['load'] as int,
+        doors: json['doors'] as int,
+        drivetrain: json['drivetrain'] as String,
+        fuelType: json['fuelType'] as String,
+        transmission: json['transmission'] as String,
+        type: json['type'] as String);
+  }
+
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'engineType': engineType,
+  //     'engineSize': engineSize,
+  //     'doors': doors,
+  //     'passengers': passengers,
+  //     'load': load,
+  //     'fuelType': fuelType,
+  //     'transmission': transmission,
+  //     'drivetrain': drivetrain,
+  //     'type': type,
+  //   };
+  // }
+}
+
+class VehicleVerificationOverview {
+  final String stage;
+  final String message;
+  final bool passed;
+
+  VehicleVerificationOverview(
+      {required this.message, required this.passed, required this.stage});
+
+  factory VehicleVerificationOverview.fromJson(Map<String, dynamic> json) {
+    return VehicleVerificationOverview(
+        message: json['message'] as String,
+        passed: json['passed'] as bool,
+        stage: json['stage'] as String);
+  }
 }

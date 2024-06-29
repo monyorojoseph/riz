@@ -18,6 +18,7 @@ import 'package:mobile/pages/seller/home.dart';
 import 'package:mobile/pages/seller/menu.dart';
 import 'package:mobile/pages/seller/notifications.dart';
 import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/pages/seller/vehicle/editvehicle.dart';
 import 'package:mobile/utils/storage.dart';
 
 import 'pages/account/account.dart';
@@ -78,7 +79,8 @@ class MyApp extends StatelessWidget {
         SellerMenuPage.routeName: (context) => const SellerMenuPage(),
         SellerNotificationPage.routeName: (context) =>
             const SellerNotificationPage(),
-        CreateVehiclePage.routeName: (context) => const CreateVehiclePage()
+        CreateVehiclePage.routeName: (context) => const CreateVehiclePage(),
+        EditVehiclePage.routeName: (context) => const EditVehiclePage()
       },
     );
   }

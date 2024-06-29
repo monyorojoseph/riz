@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:http/http.dart';
 import 'package:mobile/classes/vehicle.dart';
 import 'package:mobile/services/utils.dart';
+import 'package:image_picker/image_picker.dart';
 
 // vehicle brand
 Future<List<VehicleBrand>> getVehicleBrands() async {
@@ -32,19 +34,67 @@ Future<List<VehicleModel>> getVehicleModels(String brandId) async {
 }
 
 // list vehicle
-Future<Null> listVehicle(Map<String, dynamic> data) async {
+Future<Vehicle> listVehicle(Map<String, dynamic> data) async {
   final response =
       await genericPost(true, 'http://127.0.0.1:8000/vehicle/create', data);
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
-    // return User.fromJson(responseData);
+    return Vehicle.fromJson(responseData);
   } else {
     throw Exception('Failed to get user details.');
   }
 }
+
+// create land vehicle
+
+Future<LandVehicle> createLandVehicle(
+    String vehicleId, Map<String, dynamic> data) async {
+  final response = await genericPost(
+      true, 'http://127.0.0.1:8000/land-vehicle/$vehicleId/create', data);
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    return LandVehicle.fromJson(responseData);
+  } else {
+    throw Exception('Failed to get user details.');
+  }
+}
+
 // listed vehicle details
 // my listed vehicles
+Future<List<Vehicle>> myListedtVehicleModels() async {
+  final response =
+      await genericGet(true, 'http://127.0.0.1:8000/user/vehicles');
+
+  if (response.statusCode == 200) {
+    final List<dynamic> responseData = jsonDecode(response.body);
+    // print(responseData);
+    return responseData
+        .map((e) => Vehicle.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } else {
+    throw Exception('Failed to get vehicle models.');
+  }
+}
 // update listed vehicle
 // deleted listed vehicle
 
+// overview verfication
+
+Future<List<VehicleVerificationOverview>> vehicleVerificationOverview(
+    String id) async {
+  final response = await genericGet(
+      true, 'http://127.0.0.1:8000/vehicle/$id/verification-overview');
+
+  if (response.statusCode == 200) {
+    final List<dynamic> responseData = jsonDecode(response.body);
+    // print(responseData);
+    return responseData
+        .map((e) =>
+            VehicleVerificationOverview.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } else {
+    throw Exception('Failed to get vehicle models.');
+  }
+}

@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.validators import MaxLengthValidator
-from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, AFTER_CREATE
+from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, AFTER_CREATE, AFTER_DELETE
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 
@@ -144,6 +144,8 @@ class VehicleBrand(models.Model):
     class Meta:
         ordering = ["name"]
 
+    def __str__(self) -> str:
+        return self.name
 class VehicleModel(models.Model):
     name = models.CharField(max_length=100)
     brand = models.ForeignKey('VehicleBrand', related_name='models', on_delete=models.CASCADE)
@@ -151,11 +153,14 @@ class VehicleModel(models.Model):
     class Meta:
         ordering = ["name"]
 
-class Vehicle(models.Model):
+    def __str__(self) -> str:
+        return self.name
+
+class Vehicle(LifecycleModelMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     model = models.ForeignKey('VehicleModel', related_name='vehicles', on_delete=models.DO_NOTHING, null=True)
     brand = models.ForeignKey('VehicleBrand', related_name='vehicles', on_delete=models.DO_NOTHING, null=True)
-    yom = models.CharField(max_length=6, null=True)
+    yom = models.DateTimeField(null=True)
     category = models.CharField(default=VehicleTypes.LAND, choices=VehicleTypes.choices, max_length=3)
     
     seller = models.ForeignKey('User', related_name='vehicles', on_delete=models.SET_NULL, null=True, blank=True)
@@ -171,6 +176,10 @@ class Vehicle(models.Model):
 
     def __str__(self) -> str:
         return f"{self.brand} {self.model}" 
+    
+    @hook(AFTER_DELETE)
+    def remove_related_content(self):
+        self.contentObject.delete()
 
 class VehicleImage(models.Model):
     vehicle = models.ForeignKey('Vehicle', related_name='images', on_delete=models.CASCADE)
@@ -211,7 +220,7 @@ class LandVehicle(models.Model):
     ]
 
     engineType = models.CharField(choices=ENGINE_TYPE_CHOICES, max_length=5, null=True, blank=True)
-    engineSize = models.CharField(null=True, blank=True)
+    engineSize = models.PositiveIntegerField(null=True, blank=True)
     doors = models.PositiveIntegerField(null=True, blank=True)
     passengers = models.PositiveIntegerField(default=1)
     load = models.PositiveIntegerField()
@@ -255,7 +264,23 @@ class LandVehicle(models.Model):
     drivetrain = models.CharField(choices=DRIVETRAIN_TYPE_CHOICES, max_length=5, null=True, blank=True)
     type = models.CharField(default=LandVehicleTypes.SALOON_CAR, choices=VehicleTypes.choices, max_length=5)
 
+class Pricing(models.Model):
+    vehicle = models.ForeignKey('Vehicle', related_name='prices', on_delete=models.CASCADE)
+    HOUR = 'HR'
+    DAY = 'DY'
+    MONTH = 'MH'
 
+    PERIOD_CHOICES = [
+        (HOUR, "Per hour pricing rate"),
+        (DAY, "Per day pricing rate"),
+        (MONTH, "Per month pricing rate")
+    ]
+
+    period = models.CharField(default=DAY, choices=PERIOD_CHOICES, max_length=5)
+    amount = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ['vehicle', 'period']
 
 # class ShopMembershipRole(models.TextChoices):
 #     OWNER = "OR", _("Owner")
@@ -292,34 +317,6 @@ class LandVehicle(models.Model):
 #         # create shop wallet
 #         wallet = Wallet.objects.create(shop=self, balance=0)
     
-
-# class Pricing(models.Model):
-#     item = models.ForeignKey('Item', related_name='prices', on_delete=models.CASCADE)
-
-#     RENT = 'RT'
-#     LEASE = 'LE'
-
-#     TYPE_CHOICES = [
-#         (RENT, "Renting for a few days"),
-#         (LEASE, "Leasing for a long period")
-#     ]
-
-#     type = models.CharField(default=RENT, choices=TYPE_CHOICES, max_length=5)
-
-#     HOUR = 'HR'
-#     DAY = 'DY'
-#     MONTH = 'MH'
-
-#     PERIOD_CHOICES = [
-#         (HOUR, "Per hour pricing rate"),
-#         (DAY, "Per day pricing rate"),
-#         (MONTH, "Per month pricing rate")
-#     ]
-
-#     period = models.CharField(default=DAY, choices=PERIOD_CHOICES, max_length=5)
-#     amount = models.PositiveIntegerField()
-#     downPaymentAmount = models.PositiveIntegerField(null=True, blank=True)
-
 
 # class Order(LifecycleModelMixin, models.Model):
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

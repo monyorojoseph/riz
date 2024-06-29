@@ -20,6 +20,7 @@ class MainLoaderPage extends HookWidget {
       } else if (usersetting.data?.currentScreen == "SLR") {
         navigateToSellerHomePage(context);
       }
+      return null;
     }, [usersetting]);
 
     return const Scaffold(

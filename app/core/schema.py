@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional, Type
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
-from .models import User, UserSetting, Vehicle, VehicleImage, VehicleBrand, VehicleModel
+from .models import LandVehicle, Pricing, User, UserSetting, Vehicle, VehicleImage, VehicleBrand, VehicleModel
 
 """ User """
 SlimUserSchema = create_schema(User, fields=['email', 'fullName', 'id', 'verifiedEmail', 'verified'])
@@ -18,33 +18,64 @@ class LogoutSchema(Schema):
     access: str
 
 
-UserSettingSchema = create_schema(UserSetting)
-UpdateUserSettingSchema = create_schema(UserSetting, fields=['appPurpose', 'currentScreen'], \
+UserSettingSchema = create_schema(model=UserSetting)
+UpdateUserSettingSchema = create_schema(model=UserSetting, fields=['appPurpose', 'currentScreen'], \
                             optional_fields=['appPurpose', 'currentScreen'])
 
 
 """ Vehicle """
-VehicleBrandSchema = create_schema(VehicleBrand)
-VehicleModelSchema = create_schema(VehicleModel)
+VehicleBrandSchema = create_schema(model=VehicleBrand)
+VehicleModelSchema = create_schema(model=VehicleModel)
 
 
-VehicleImageSchema = create_schema(VehicleImage, fields=['id', 'image', 'coverImage'])
+VehicleImageSchema = create_schema(model=VehicleImage, fields=['id', 'image', 'coverImage'])
 VehicleSchema = create_schema(
     model=Vehicle, 
-    fields=['id', 'model', 'brand', 'yom', 'category', 'contentType', 'contentId', 'display',
+    fields=['id', 'yom', 'category', 'contentType', 'contentId', 'display',
             'createdOn', 'updatedOn'],
     custom_fields=[
+        ('brand', VehicleBrandSchema, None),
+        ('model', VehicleModelSchema, None),
         ('images', list[VehicleImageSchema], []),
         ('seller', Optional[SlimUserSchema], None),
     ])
 
 class VehicleSchemaIn(Schema):
-    model: str
-    brand: str
+    model_id: str
+    brand_id: str
     category: str
     yom: str = None
     seller_id: str = None
     # shop_id: str = None
+
+
+LandVehicleShema = create_schema(model=LandVehicle)
+class LandVehicleShemaIn(Schema):
+    engineType: str
+    engineSize: str
+    doors: Optional[int] = None
+    passengers: int
+    load: int
+    fuelType: str
+    transmission: str
+    drivetrain: Optional[str] = None
+    type: str
+
+class OverviewMessage(Schema):
+    stage: str
+    message: str
+    passed: bool
+    
+
+""" PRICING """
+PricingSchema = create_schema(Pricing)
+
+class PricingSchemaIn(Schema):
+    vehicle_id: str
+    period: str
+    amount: int
+
+
 
 
 # """ Shop """
