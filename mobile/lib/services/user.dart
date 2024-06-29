@@ -22,7 +22,6 @@ Future<User> getUserDetails() async {
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
-    print(responseData);
     return User.fromJson(responseData);
   } else {
     throw Exception('Failed to get user details.');
