@@ -96,7 +96,30 @@ class EditVehicleBasic extends HookWidget {
                     onPressed: () async {
                       if (_formKey.currentState?.saveAndValidate() ?? false) {
                         final formData = _formKey.currentState?.value;
-                        if (formData != null) {}
+                        if (formData != null) {
+                          final data = {
+                            "brand_id": formData['brand'].toString(),
+                            "model_id": formData['model'].toString(),
+                            "category": vehicle.category,
+                            "yom": (formData['yom'] as DateTime).toString(),
+                          };
+                          try {
+                            isLoading.value = true;
+                            await updateVehicle(vehicle.id, data);
+                            isLoading.value = false;
+                          } catch (e) {
+                            // debugPrint('Failed to update vehicle details: $e');
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Failed to update vehicle details: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        }
                       }
                     },
                     child: Text(

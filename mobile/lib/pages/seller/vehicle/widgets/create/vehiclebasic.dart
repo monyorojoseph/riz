@@ -117,7 +117,6 @@ class CreateVehicleBasic extends HookWidget {
                             "yom": (formData['yom'] as DateTime).toString(),
                           };
 
-                          debugPrint(data.toString());
                           try {
                             isLoading.value = true;
                             final newVehicle = await listVehicle(data);

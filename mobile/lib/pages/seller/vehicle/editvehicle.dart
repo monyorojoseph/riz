@@ -24,6 +24,17 @@ class EditVehiclePage extends HookWidget {
         useQuery(['${args.id}-vehicle'], () => listedVehicleDetails(args.id));
     final currentPage = useState<EditSteps>(EditSteps.overview);
 
+    if (vehicle.isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Edit Vehicle"),
+        ),
+        body: const Center(
+          child: Text("Loading"),
+        ),
+      );
+    }
+
     Widget selectedPage = useMemoized(() {
       switch (currentPage.value) {
         case EditSteps.basic:
@@ -37,21 +48,12 @@ class EditVehiclePage extends HookWidget {
         case EditSteps.rules:
           return EditVehicleRules(vehicle: vehicle.data!);
         default:
-          return EditVehicleOverview(currentPage: currentPage);
+          return EditVehicleOverview(
+            currentPage: currentPage,
+            vehicle: vehicle.data!,
+          );
       }
     }, [currentPage.value]);
-
-    if (vehicle.isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("Edit Vehicle"),
-        ),
-        body: const Center(
-          child: Text("Loading"),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Vehicle"),

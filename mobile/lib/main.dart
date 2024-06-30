@@ -53,7 +53,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
         bottomAppBarTheme: const BottomAppBarTheme(
-            surfaceTintColor: Colors.white, shadowColor: Colors.black54),
+            surfaceTintColor: Colors.white,
+            shadowColor: Colors.black54,
+            color: Colors.white),
         tabBarTheme: const TabBarTheme(
             labelColor: Colors.black, indicatorColor: Colors.black),
         inputDecorationTheme: const InputDecorationTheme(
@@ -61,6 +63,7 @@ class MyApp extends StatelessWidget {
           labelStyle: TextStyle(color: Colors.black),
           floatingLabelStyle: TextStyle(color: Colors.black),
         ),
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
       // initialRoute: LoginPage.routeName,

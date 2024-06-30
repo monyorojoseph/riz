@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mobile/classes/pageargs/editvehicle.dart';
 import 'package:mobile/classes/utils.dart';
@@ -34,7 +35,8 @@ class SellerHomePage extends HookWidget {
       )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, CreateVehiclePage.routeName);
+          Navigator.pushNamed(context, CreateVehiclePage.routeName,
+              arguments: CreateVehiclePageArgs());
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
@@ -112,78 +114,86 @@ class VehicleListings extends HookWidget {
   }
 }
 
-class VehicleListing extends HookWidget {
+class VehicleListing extends StatefulWidget {
   final Vehicle vehicle;
   const VehicleListing({super.key, required this.vehicle});
+  @override
+  State<VehicleListing> createState() => _VehicleListingState();
+}
+
+class _VehicleListingState extends State<VehicleListing>
+    with SingleTickerProviderStateMixin {
+  late final controller = SlidableController(this);
 
   @override
   Widget build(BuildContext context) {
-    final bg = useState<Color>(
-        vehicle.display ? Colors.white : Colors.black.withOpacity(0.05));
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, EditVehiclePage.routeName,
-            arguments: EditVehiclePageArgs(vehicle.id));
-      },
-      onLongPress: () async {
-        bg.value = Colors.greenAccent;
-        final response = await appService.genericGet(
-            true, '$baseUrl/vehicle/${vehicle.id}/enable-display');
-        if (response.statusCode == 200) {
-          bg.value = Colors.white;
-
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Your vehicle is visible to the public'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        } else {
-          bg.value = Colors.black.withOpacity(0.05);
-          if (context.mounted) {
-            final msg = ErrorMessage.fromJson(
-                jsonDecode(response.body) as Map<String, dynamic>);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text('Update failed: ${msg.detail} to enable display.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      },
-      // onHorizontalDragStart: (details) {
-      //   debugPrint(details.toString());
-      //   debugPrint("Horiz");
-      // },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: bg.value,
-          borderRadius: const BorderRadius.all(Radius.circular(3)),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                spreadRadius: 4,
-                blurRadius: 7,
-                offset: const Offset(0, 3))
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 7.5),
+      child: Slidable(
+        key: ValueKey(widget.vehicle.id),
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          dismissible: DismissiblePane(onDismissed: () {}),
+          children: <Widget>[
+            SlidableAction(
+              onPressed: (BuildContext context) {},
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              icon: Icons.remove_red_eye,
+              label: "Display",
+            ),
+            SlidableAction(
+              onPressed: (BuildContext context) {},
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+              label: "Delete",
+            )
           ],
         ),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text('${vehicle.brand.name}  ${vehicle.model.name}')
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, EditVehiclePage.routeName,
+                arguments: EditVehiclePageArgs(widget.vehicle.id));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            decoration: BoxDecoration(
+              color: widget.vehicle.display
+                  ? Colors.white
+                  : Colors.black.withOpacity(0.05),
+              borderRadius: const BorderRadius.all(Radius.circular(3)),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 4,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3))
               ],
             ),
-            Row(
-              children: <Widget>[Text(vehicle.yom.toString())],
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Text(
+                      '${widget.vehicle.brand.name}  ${widget.vehicle.model.name}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: <Widget>[
+                    Text(
+                      widget.vehicle.yom.toString(),
+                      style: const TextStyle(fontWeight: FontWeight.w400),
+                    )
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

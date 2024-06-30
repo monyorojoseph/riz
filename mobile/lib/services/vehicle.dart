@@ -104,7 +104,20 @@ Future<List<VehicleImage>> vehicleImages(String id) async {
     throw Exception('Failed to get vehicle images');
   }
 }
+
 // update listed vehicle
+Future<Vehicle> updateVehicle(
+    String vehicleId, Map<String, dynamic> data) async {
+  final response =
+      await appService.genericPut('$baseUrl/vehicle/$vehicleId/update', data);
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    return Vehicle.fromJson(responseData);
+  } else {
+    throw Exception('Failed to update vehicle details.');
+  }
+}
 // deleted listed vehicle
 
 // overview verfication
@@ -136,5 +149,19 @@ Future<LandVehicle> landVehicleDetails(String id) async {
     return LandVehicle.fromJson(responseData as Map<String, dynamic>);
   } else {
     throw Exception('Failed to get land vehicle details.');
+  }
+}
+
+// update land vehicle
+Future<LandVehicle> updateLandVehicle(
+    String id, Map<String, dynamic> data) async {
+  final response =
+      await appService.genericPut('$baseUrl/land-vehicle/$id/update', data);
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    return LandVehicle.fromJson(responseData);
+  } else {
+    throw Exception('Failed to update land vehicle details.');
   }
 }

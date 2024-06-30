@@ -1,13 +1,36 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fquery/fquery.dart';
+import 'package:mobile/classes/pageargs/editvehicle.dart';
+import 'package:mobile/classes/utils.dart';
+import 'package:mobile/classes/vehicle.dart';
+import 'package:mobile/pages/seller/vehicle/create.dart';
 import 'package:mobile/pages/seller/vehicle/editvehicle.dart';
+import 'package:mobile/services/url.dart';
+import 'package:mobile/services/utils.dart';
+import 'package:mobile/services/vehicle.dart';
 
 class EditVehicleOverview extends HookWidget {
   final ValueNotifier<EditSteps> currentPage;
-  const EditVehicleOverview({super.key, required this.currentPage});
+  final Vehicle vehicle;
+
+  const EditVehicleOverview(
+      {super.key, required this.currentPage, required this.vehicle});
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = useState<bool>(false);
+    final displayVehicle = useState<bool>(vehicle.display);
+    final vehicleOverview = useQuery(['${vehicle.id}-overview-verification'],
+        () => vehicleVerificationOverview(vehicle.id));
+
+    if (vehicleOverview.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       children: <Widget>[
@@ -42,7 +65,19 @@ class EditVehicleOverview extends HookWidget {
         ),
         GestureDetector(
           onTap: () {
-            currentPage.value = EditSteps.details;
+            final bool passed = vehicleOverview.data
+                    ?.where((element) => element.stage == "details")
+                    .first
+                    .passed ??
+                false;
+
+            if (passed) {
+              currentPage.value = EditSteps.details;
+            } else {
+              Navigator.pushNamed(context, CreateVehiclePage.routeName,
+                  arguments: CreateVehiclePageArgs(
+                      vehicle: vehicle, page: CreateSteps.details));
+            }
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 7),
@@ -61,7 +96,19 @@ class EditVehicleOverview extends HookWidget {
         ),
         GestureDetector(
           onTap: () {
-            currentPage.value = EditSteps.images;
+            final bool passed = vehicleOverview.data
+                    ?.where((element) => element.stage == "images")
+                    .first
+                    .passed ??
+                false;
+
+            if (passed) {
+              currentPage.value = EditSteps.images;
+            } else {
+              Navigator.pushNamed(context, CreateVehiclePage.routeName,
+                  arguments: CreateVehiclePageArgs(
+                      vehicle: vehicle, page: CreateSteps.images));
+            }
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 7),
@@ -80,7 +127,19 @@ class EditVehicleOverview extends HookWidget {
         ),
         GestureDetector(
           onTap: () {
-            currentPage.value = EditSteps.rates;
+            final bool passed = vehicleOverview.data
+                    ?.where((element) => element.stage == "rates")
+                    .first
+                    .passed ??
+                false;
+
+            if (passed) {
+              currentPage.value = EditSteps.rates;
+            } else {
+              Navigator.pushNamed(context, CreateVehiclePage.routeName,
+                  arguments: CreateVehiclePageArgs(
+                      vehicle: vehicle, page: CreateSteps.rates));
+            }
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 7),
@@ -99,7 +158,19 @@ class EditVehicleOverview extends HookWidget {
         ),
         GestureDetector(
           onTap: () {
-            currentPage.value = EditSteps.rules;
+            final bool passed = vehicleOverview.data
+                    ?.where((element) => element.stage == "rules")
+                    .first
+                    .passed ??
+                false;
+
+            if (passed) {
+              currentPage.value = EditSteps.rules;
+            } else {
+              Navigator.pushNamed(context, CreateVehiclePage.routeName,
+                  arguments: CreateVehiclePageArgs(
+                      vehicle: vehicle, page: CreateSteps.rules));
+            }
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 7),
@@ -116,6 +187,88 @@ class EditVehicleOverview extends HookWidget {
             ),
           ),
         ),
+        const SizedBox(height: 40),
+        Row(
+          children: <Widget>[
+            Switch(
+              value: displayVehicle.value,
+              onChanged: (value) async {
+                displayVehicle.value = value;
+                if (value) {
+                  // display action
+                  isLoading.value = true;
+                  final response = await appService.genericGet(
+                      true, '$baseUrl/vehicle/${vehicle.id}/enable-display');
+                  isLoading.value = false;
+                  if (response.statusCode == 200) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Your vehicle is visible to the public'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } else {
+                    displayVehicle.value = !value;
+                    if (context.mounted) {
+                      final msg = ErrorMessage.fromJson(
+                          jsonDecode(response.body) as Map<String, dynamic>);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Update failed: ${msg.detail} to enable display.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                } else {
+                  // hide action
+                  isLoading.value = true;
+                  final data = {
+                    "model_id": vehicle.model.id.toString(),
+                    "brand_id": vehicle.brand.id.toString(),
+                    "category": vehicle.category,
+                    "display": value
+                  };
+                  final response = await appService.genericPut(
+                      '$baseUrl/vehicle/${vehicle.id}/update', data);
+                  isLoading.value = false;
+                  if (response.statusCode == 200) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Your vehicle is hidden from the public'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } else {
+                    displayVehicle.value = !value;
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Update failed: Your vehicle is still visible to public.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+              activeColor: Colors.green,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              displayVehicle.value ? "Hide" : "Display",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            )
+          ],
+        )
       ],
     );
   }

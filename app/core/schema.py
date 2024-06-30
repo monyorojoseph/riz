@@ -37,6 +37,7 @@ VehicleSchema = create_schema(
         ('brand', VehicleBrandSchema, None),
         ('model', VehicleModelSchema, None),
         ('images', list[VehicleImageSchema], []),
+        ('prices', list[create_schema(Pricing)], []),
         ('seller', Optional[SlimUserSchema], None),
     ])
 
@@ -45,6 +46,7 @@ class VehicleSchemaIn(Schema):
     brand_id: str
     category: str
     yom: str = None
+    display: bool = False
     seller_id: str = None
     # shop_id: str = None
 

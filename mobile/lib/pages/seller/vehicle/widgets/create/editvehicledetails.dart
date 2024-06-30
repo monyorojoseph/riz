@@ -178,7 +178,36 @@ class EditVehicleDetails extends HookWidget {
                     onPressed: () async {
                       if (_formKey.currentState?.saveAndValidate() ?? false) {
                         final formData = _formKey.currentState?.value;
-                        if (formData != null) {}
+                        if (formData != null) {
+                          final data = {
+                            'engineType': formData['engineType'].toString(),
+                            'engineSize': formData['engineSize'].toString(),
+                            'doors': formData['doors'].toString(),
+                            'passengers': formData['passengers'].toString(),
+                            'load': formData['load'].toString(),
+                            'fuelType': formData['fuelType'].toString(),
+                            'transmission': formData['transmission'].toString(),
+                            'drivetrain': formData['drivetrain'].toString(),
+                            'type': formData['type'].toString(),
+                          };
+                          try {
+                            isLoading.value = true;
+                            await updateLandVehicle(
+                                landvehicle.data!.id.toString(), data);
+                            isLoading.value = false;
+                          } catch (e) {
+                            // debugPrint('Failed to update vehicle details: $e');
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Failed to update land vehicle details: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        }
                       }
                     },
                     child: Text(

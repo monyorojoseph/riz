@@ -230,9 +230,17 @@ class VehicleAPI:
     # create 
     @route.post(path="create", response=VehicleSchema, auth= JWTAuth())
     def create(self, request, data: VehicleSchemaIn):
-        print(data)
         vehicle = Vehicle.objects.create(**data.dict())
         return vehicle
+
+    # update details
+    @route.put("{str:id}/update", response=VehicleSchema, auth=JWTAuth())
+    def update(self, request, id, data: VehicleSchemaIn):
+        vehicle = Vehicle.objects.get(id=id)
+        for attr, value in data.dict(exclude_unset=True).items():
+            setattr(vehicle, attr, value)
+        vehicle.save()
+        return vehicle 
     
     # enable display
     @route.get("{str:id}/enable-display", response={200: VehicleSchema, codes_4xx: Error }, auth=JWTAuth())
@@ -248,7 +256,6 @@ class VehicleAPI:
             return 400, {"detail": "You need to post atleast 2 pictures"}
 
         # vehicle has prices
-        print(vehicle.prices.count())
         if vehicle.prices.count() == 0:            
             return 400, {"detail": "You need to create pricing for your vehicle"}
 
@@ -263,6 +270,7 @@ class VehicleAPI:
     def verification_overview(self, request, id):
         vehicle = Vehicle.objects.prefetch_related("images").get(id=id)
         data = []
+
         # user is verified
         user = request.user
         userStageData = {"stage": "user", "message": "User Account Not Verified", "passed": False }
@@ -271,15 +279,22 @@ class VehicleAPI:
             userStageData['passed'] = True
         data.append(userStageData)
 
+        # details
+        contentStageData = {"stage": "details", "message": "You have not created vehicle details", "passed": False }
+        if vehicle.contentId and vehicle.contentId:
+            contentStageData['message'] = "Vehicle details are provided"
+            contentStageData['passed'] = True
+        data.append(contentStageData)
+
         # vehicle has images
         imagesStageData = {"stage": "images", "message": "Your vehicle needs images to attract clients", "passed": False }
-        if vehicle.images.count() > 3:
+        if vehicle.images.count() >= 3:
             imagesStageData["message"] = "You have posted vehicle images"
             imagesStageData["passed"] = True
         data.append(imagesStageData)
 
         # vehicle has prices
-        pricingStageData = {"stage": "price", "message": "You need to have atleast one pricing Structure.", "passed": False }
+        pricingStageData = {"stage": "rates", "message": "You need to have atleast one pricing Structure.", "passed": False }
         if vehicle.prices.count() > 0:
             pricingStageData["message"] = "You have added pricing structure"
             pricingStageData["passed"] = True
@@ -287,6 +302,9 @@ class VehicleAPI:
 
         # TODO vehicle rules to clients
         # vehicle has rules
+        rulesStageData = {"stage": "rules", "message": "You need to have provide rules for who can rent your car", "passed": False }
+        data.append(rulesStageData)
+
         return data
 
     """ IMAGES """
@@ -334,7 +352,15 @@ class LandVehicleAPI:
         vehicle.save()
         return landvehicle
     
-    # update
+    # update    
+    @route.put("{str:id}/update", response=LandVehicleShema, auth=JWTAuth())
+    def update(self, request, id, data: LandVehicleShemaIn):
+        landvehicle = LandVehicle.objects.get(id=id)
+        for attr, value in data.dict(exclude_unset=True).items():
+            setattr(landvehicle, attr, value)
+        landvehicle.save()
+        return landvehicle 
+    
 
     # details
     @route.get("{str:id}/details", response=LandVehicleShema)
