@@ -51,7 +51,16 @@ class MyApp extends StatelessWidget {
         ...FormBuilderLocalizations.supportedLocales
       ],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
+        bottomAppBarTheme: const BottomAppBarTheme(
+            surfaceTintColor: Colors.white, shadowColor: Colors.black54),
+        tabBarTheme: const TabBarTheme(
+            labelColor: Colors.black, indicatorColor: Colors.black),
+        inputDecorationTheme: const InputDecorationTheme(
+          focusColor: Colors.black,
+          labelStyle: TextStyle(color: Colors.black),
+          floatingLabelStyle: TextStyle(color: Colors.black),
+        ),
         useMaterial3: true,
       ),
       // initialRoute: LoginPage.routeName,
