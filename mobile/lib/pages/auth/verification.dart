@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mobile/classes/auth.dart';
+import 'package:mobile/classes/pageargs/authverification.dart';
 import 'package:mobile/pages/loaders/mainpage.dart';
 import 'package:mobile/services/auth.dart';
 import 'package:mobile/utils/storage.dart';
@@ -15,7 +16,6 @@ class AuthVerificationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as AuthVerificationPageArgs;
-    String fullName = args.fullName;
 
     return Scaffold(
       body: Container(
@@ -28,7 +28,7 @@ class AuthVerificationPage extends StatelessWidget {
               const Text("Token Auth Verification"),
               const SizedBox(height: 10),
               Text(
-                  "$fullName Auth token has been sent to your email, use it to login."),
+                  "${args.fullName} Auth token has been sent to your email, use it to login."),
               AuthVerificationForm(email: args.email),
             ],
           ),

@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 // vehicle brand
 Future<List<VehicleBrand>> getVehicleBrands() async {
-  final response = await genericGet(true, '$baseUrl/brand/all');
+  final response = await appService.genericGet(true, '$baseUrl/brand/all');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -20,8 +20,8 @@ Future<List<VehicleBrand>> getVehicleBrands() async {
 
 // vehicle models
 Future<List<VehicleModel>> getVehicleModels(String brandId) async {
-  final response =
-      await genericGet(true, '$baseUrl/brand/models?brandId=$brandId');
+  final response = await appService.genericGet(
+      true, '$baseUrl/brand/models?brandId=$brandId');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -35,35 +35,48 @@ Future<List<VehicleModel>> getVehicleModels(String brandId) async {
 
 // list vehicle
 Future<Vehicle> listVehicle(Map<String, dynamic> data) async {
-  final response = await genericPost(true, '$baseUrl/vehicle/create', data);
+  final response =
+      await appService.genericPost(true, '$baseUrl/vehicle/create', data);
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
     return Vehicle.fromJson(responseData);
   } else {
-    throw Exception('Failed to get user details.');
+    throw Exception('Failed to create vehicle.');
   }
 }
 
 // create land vehicle
-
 Future<LandVehicle> createLandVehicle(
     String vehicleId, Map<String, dynamic> data) async {
-  final response =
-      await genericPost(true, '$baseUrl/land-vehicle/$vehicleId/create', data);
+  final response = await appService.genericPost(
+      true, '$baseUrl/land-vehicle/$vehicleId/create', data);
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
     return LandVehicle.fromJson(responseData);
   } else {
-    throw Exception('Failed to get user details.');
+    throw Exception('Failed to create land.');
   }
 }
 
 // listed vehicle details
+Future<Vehicle> listedVehicleDetails(String id) async {
+  final response =
+      await appService.genericGet(true, '$baseUrl/vehicle/$id/details');
+
+  if (response.statusCode == 200) {
+    final dynamic responseData = jsonDecode(response.body);
+    // print(responseData);
+    return Vehicle.fromJson(responseData as Map<String, dynamic>);
+  } else {
+    throw Exception('Failed to get vehicle details.');
+  }
+}
+
 // my listed vehicles
-Future<List<Vehicle>> myListedtVehicleModels() async {
-  final response = await genericGet(true, '$baseUrl/user/vehicles');
+Future<List<Vehicle>> myListedVehicles() async {
+  final response = await appService.genericGet(true, '$baseUrl/user/vehicles');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -72,18 +85,33 @@ Future<List<Vehicle>> myListedtVehicleModels() async {
         .map((e) => Vehicle.fromJson(e as Map<String, dynamic>))
         .toList();
   } else {
-    throw Exception('Failed to get vehicle models.');
+    throw Exception('Failed to get my listed vehicles.');
+  }
+}
+
+// my listed vehicles
+Future<List<VehicleImage>> vehicleImages(String id) async {
+  final response =
+      await appService.genericGet(true, '$baseUrl/vehicle/$id/images');
+
+  if (response.statusCode == 200) {
+    final List<dynamic> responseData = jsonDecode(response.body);
+    // print(responseData);
+    return responseData
+        .map((e) => VehicleImage.fromJson(e as Map<String, dynamic>))
+        .toList();
+  } else {
+    throw Exception('Failed to get vehicle images');
   }
 }
 // update listed vehicle
 // deleted listed vehicle
 
 // overview verfication
-
 Future<List<VehicleVerificationOverview>> vehicleVerificationOverview(
     String id) async {
-  final response =
-      await genericGet(true, '$baseUrl/vehicle/$id/verification-overview');
+  final response = await appService.genericGet(
+      true, '$baseUrl/vehicle/$id/verification-overview');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
@@ -93,6 +121,20 @@ Future<List<VehicleVerificationOverview>> vehicleVerificationOverview(
             VehicleVerificationOverview.fromJson(e as Map<String, dynamic>))
         .toList();
   } else {
-    throw Exception('Failed to get vehicle models.');
+    throw Exception('Failed to get vehicle verification overview.');
+  }
+}
+
+// land vehicle details
+Future<LandVehicle> landVehicleDetails(String id) async {
+  final response =
+      await appService.genericGet(true, '$baseUrl/land-vehicle/$id/details');
+
+  if (response.statusCode == 200) {
+    final dynamic responseData = jsonDecode(response.body);
+    // print(responseData);
+    return LandVehicle.fromJson(responseData as Map<String, dynamic>);
+  } else {
+    throw Exception('Failed to get land vehicle details.');
   }
 }

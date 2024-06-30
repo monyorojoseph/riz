@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
+import 'package:mobile/classes/pageargs/editvehicle.dart';
 import 'package:mobile/classes/utils.dart';
 import 'package:mobile/classes/vehicle.dart';
 import 'package:mobile/pages/seller/vehicle/create.dart';
@@ -84,8 +85,7 @@ class VehicleListings extends HookWidget {
   const VehicleListings({super.key});
   @override
   Widget build(BuildContext context) {
-    final listings = useQuery(['myListings'], myListedtVehicleModels);
-    debugPrint(listings.data?.length.toString());
+    final listings = useQuery(['myListings'], myListedVehicles);
 
     if (listings.isLoading) {
       return const Center(
@@ -122,11 +122,12 @@ class VehicleListing extends HookWidget {
         vehicle.display ? Colors.white : Colors.black.withOpacity(0.05));
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, EditVehiclePage.routeName);
+        Navigator.pushNamed(context, EditVehiclePage.routeName,
+            arguments: EditVehiclePageArgs(vehicle.id));
       },
       onLongPress: () async {
         bg.value = Colors.greenAccent;
-        final response = await genericGet(
+        final response = await appService.genericGet(
             true, '$baseUrl/vehicle/${vehicle.id}/enable-display');
         if (response.statusCode == 200) {
           bg.value = Colors.white;

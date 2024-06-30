@@ -16,7 +16,7 @@ from ninja.responses import codes_4xx
 # from .utils import gen_shop_membeship_join_token
 from .models import LandVehicle, Pricing, User, UserAuthToken, UserSetting, Vehicle, VehicleBrand, VehicleImage, VehicleModel
 from .schema import Error, LandVehicleShema, LandVehicleShemaIn, LogoutSchema, MyTokenObtainPairOutSchema, OverviewMessage, PricingSchema, PricingSchemaIn, SlimUserSchema, UpdateUserSettingSchema \
-    ,UserSchema, UpdateUserSchema, UserSettingSchema, VehicleBrandSchema, VehicleModelSchema, VehicleSchema, VehicleSchemaIn 
+    ,UserSchema, UpdateUserSchema, UserSettingSchema, VehicleBrandSchema, VehicleImageSchema, VehicleModelSchema, VehicleSchema, VehicleSchemaIn 
 from .tasks import send_email_auth_token
 
 
@@ -221,19 +221,17 @@ api.register_controllers(BrandModelAPI)
 """ VEHICLE Related APIs """
 @api_controller("vehicle/", tags=["Vehicle"])
 class VehicleAPI:
+    # vehicle details
+    @route.get("{str:id}/details", response=VehicleSchema)
+    def details(self, request, id):
+        vehicle = Vehicle.objects.get(id=id)
+        return vehicle
+    
     # create 
     @route.post(path="create", response=VehicleSchema, auth= JWTAuth())
     def create(self, request, data: VehicleSchemaIn):
         print(data)
         vehicle = Vehicle.objects.create(**data.dict())
-        return vehicle
-    
-    # create vehicle images
-    @route.post(path="{str:id}/create-images", response=VehicleSchema, auth=JWTAuth())
-    def create_vehicle_images(self, request, id, files: File[list[UploadedFile]]):
-        vehicle = Vehicle.objects.get(id=id)
-        imgs = [ VehicleImage(vehicle=vehicle, image=file) for file in files ]
-        VehicleImage.objects.bulk_create(imgs)
         return vehicle
     
     # enable display
@@ -291,8 +289,35 @@ class VehicleAPI:
         # vehicle has rules
         return data
 
+    """ IMAGES """
+    # create vehicle images
+    @route.post(path="{str:id}/create-images", response=VehicleSchema, auth=JWTAuth())
+    def create_vehicle_images(self, request, id, files: File[list[UploadedFile]]):
+        vehicle = Vehicle.objects.get(id=id)
+        imgs = [ VehicleImage(vehicle=vehicle, image=file) for file in files ]
+        VehicleImage.objects.bulk_create(imgs)
+        return vehicle
+    
+    # list vehicle images
+    @route.get("{str:id}/images", response=List[VehicleImageSchema])
+    def vehicle_images(self, request, id):
+        images = VehicleImage.objects.filter(vehicle_id=id)
+        return images
+    
+    """ PRICING """
+    # create pricing
+    @route.post("create-pricing", response=PricingSchema)
+    def create_pricing(self, request, data: PricingSchemaIn):
+        pricing = Pricing.objects.create(**data.dict())
+        return pricing
+    
+    # list pricing
+    @route.get("{str:id}/pricing", response=List[PricingSchema])
+    def vehicle_pricing(self, request, id):
+        pricings = Pricing.objects.filter(vehicle_id=id)
+        return pricings
 
-
+    
 api.register_controllers(VehicleAPI)
 
 # land vehicle
@@ -308,23 +333,17 @@ class LandVehicleAPI:
         vehicle.contentId = landvehicle.id
         vehicle.save()
         return landvehicle
+    
     # update
+
+    # details
+    @route.get("{str:id}/details", response=LandVehicleShema)
+    def details(self, request, id):
+        landvehicle = LandVehicle.objects.get(id=id)
+        return landvehicle
 
 
 api.register_controllers(LandVehicleAPI)
-
-
-""" PRICING and Related APIs """
-@api_controller("vehicle-pricing/", tags=["Vehicle Pricing"], auth=JWTAuth())
-class PricingAPI:
-    # create
-    @route.post("create", response=PricingSchema)
-    def create(self, request, data: PricingSchemaIn):
-        pricing = Pricing.objects.create(**data.dict())
-        return pricing
-
-api.register_controllers(PricingAPI)
-
 
 # """ SHOP Related APIs """
 # @api_controller("shop/", tags=["Shop"])

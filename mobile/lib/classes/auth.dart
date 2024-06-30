@@ -52,10 +52,3 @@ class AuthenticatedUser {
         user: SlimUser.fromJson(json['user'] as Map<String, dynamic>));
   }
 }
-
-class AuthVerificationPageArgs {
-  final String email;
-  final String fullName;
-
-  AuthVerificationPageArgs(this.email, this.fullName);
-}

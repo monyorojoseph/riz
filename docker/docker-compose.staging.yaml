@@ -1,7 +1,7 @@
 version: '3.9'
 
 x-app: &default-app
-  image: monyorojoseph/riz:v0.1.0
+  image: monyorojoseph/riz:v0.1.1
   env_file:
     - .env
 

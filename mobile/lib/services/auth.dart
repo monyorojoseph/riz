@@ -7,7 +7,7 @@ import 'package:mobile/services/utils.dart';
 
 // login
 Future<LoginUser> loginUser(String email, String password) async {
-  final response = await genericPost(
+  final response = await appService.genericPost(
     false,
     '$baseUrl/auth/login',
     {
@@ -28,7 +28,7 @@ Future<LoginUser> loginUser(String email, String password) async {
 
 Future<RegisterUser> registerUser(
     String email, String password, String fullName) async {
-  final response = await genericPost(
+  final response = await appService.genericPost(
     false,
     '$baseUrl/auth/registration',
     {
@@ -49,8 +49,8 @@ Future<RegisterUser> registerUser(
 // verify token and get auth tokens
 
 Future<AuthenticatedUser> getAuthTokens(String token) async {
-  final response =
-      await genericPost(false, '$baseUrl/auth/token', {'token': token});
+  final response = await appService
+      .genericPost(false, '$baseUrl/auth/token', {'token': token});
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -62,7 +62,7 @@ Future<AuthenticatedUser> getAuthTokens(String token) async {
 
 // logout
 Future<Response> logoutUser(String access) async {
-  final response = await genericPost(
+  final response = await appService.genericPost(
     false,
     '$baseUrl/auth/logout',
     {'access': access},

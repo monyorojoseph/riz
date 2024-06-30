@@ -6,7 +6,7 @@ import 'package:mobile/services/utils.dart';
 
 // user ( slim )
 Future<SlimUser> getSlimUser() async {
-  final response = await genericGet(true, '$baseUrl/user/slim');
+  final response = await appService.genericGet(true, '$baseUrl/user/slim');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -18,7 +18,7 @@ Future<SlimUser> getSlimUser() async {
 
 // user
 Future<User> getUserDetails() async {
-  final response = await genericGet(true, '$baseUrl/user/details');
+  final response = await appService.genericGet(true, '$baseUrl/user/details');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -30,7 +30,8 @@ Future<User> getUserDetails() async {
 
 // update user
 Future<User> updateUserDetails(UpdateUser data) async {
-  final response = await genericPut('$baseUrl/user/update', data.toJson());
+  final response =
+      await appService.genericPut('$baseUrl/user/update', data.toJson());
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -47,7 +48,7 @@ Future<User> updateUserDetails(UpdateUser data) async {
 // user settings
 // user settings (details)
 Future<UserSetting> getUserSettingDetails() async {
-  final response = await genericGet(true, '$baseUrl/user-settings/');
+  final response = await appService.genericGet(true, '$baseUrl/user-settings/');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -59,8 +60,8 @@ Future<UserSetting> getUserSettingDetails() async {
 
 // user settings (update)
 Future<UserSetting> updateUserSettingDetails(UpdateUserSetting data) async {
-  final response =
-      await genericPut('$baseUrl/user-settings/update', data.toJson());
+  final response = await appService.genericPut(
+      '$baseUrl/user-settings/update', data.toJson());
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);

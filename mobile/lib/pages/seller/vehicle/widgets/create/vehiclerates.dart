@@ -30,7 +30,7 @@ class CreateVehicleRates extends HookWidget {
             children: <Widget>[
               FormBuilderDropdown(
                 name: 'period',
-                decoration: const InputDecoration(labelText: 'Period'),
+                decoration: const InputDecoration(labelText: 'Rental Type'),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),

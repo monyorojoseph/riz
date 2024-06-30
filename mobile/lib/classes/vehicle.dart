@@ -68,19 +68,21 @@ class Vehicle {
         ?.map((img) => VehicleImage.fromJson(img as Map<String, dynamic>))
         .toList();
     return Vehicle(
-        id: json['id'].toString(),
-        model: VehicleModel.fromJson(json['model'] as Map<String, dynamic>),
-        brand: VehicleBrand.fromJson(json['brand'] as Map<String, dynamic>),
-        category: json['category'].toString(),
-        display: json['display'] as bool,
-        yom:
-            json['yom'] != null ? DateTime.parse(json['yom'].toString()) : null,
-        createdOn: DateTime.parse(json['createdOn'].toString()),
-        updatedOn: DateTime.parse(json['updatedOn'].toString()),
-        seller: json['seller'] != null
-            ? SlimUser.fromJson(json['seller'] as Map<String, dynamic>)
-            : null,
-        images: images);
+      id: json['id'].toString(),
+      model: VehicleModel.fromJson(json['model'] as Map<String, dynamic>),
+      brand: VehicleBrand.fromJson(json['brand'] as Map<String, dynamic>),
+      category: json['category'].toString(),
+      display: json['display'] as bool,
+      yom: json['yom'] != null ? DateTime.parse(json['yom'].toString()) : null,
+      createdOn: DateTime.parse(json['createdOn'].toString()),
+      updatedOn: DateTime.parse(json['updatedOn'].toString()),
+      seller: json['seller'] != null
+          ? SlimUser.fromJson(json['seller'] as Map<String, dynamic>)
+          : null,
+      images: images,
+      contentId: json['contentId'].toString(),
+      contentType: json['contentType'].toString(),
+    );
   }
 }
 
