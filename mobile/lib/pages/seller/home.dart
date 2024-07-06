@@ -1,18 +1,12 @@
-import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mobile/classes/pageargs/editvehicle.dart';
-import 'package:mobile/classes/utils.dart';
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
-import 'package:mobile/pages/seller/vehicle/editvehicle.dart';
-import 'package:mobile/services/url.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
+import 'package:mobile/pages/seller/vehicle/edit/editvehicle.dart';
 import 'package:mobile/services/user.dart';
-import 'package:mobile/services/utils.dart';
 import 'package:mobile/services/vehicle.dart';
 import 'package:mobile/widgets/bottomnavbar/sellerbottomnavbar.dart';
 

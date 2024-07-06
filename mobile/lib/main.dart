@@ -17,8 +17,8 @@ import 'package:mobile/pages/seller/calendar.dart';
 import 'package:mobile/pages/seller/home.dart';
 import 'package:mobile/pages/seller/menu.dart';
 import 'package:mobile/pages/seller/notifications.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
-import 'package:mobile/pages/seller/vehicle/editvehicle.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
+import 'package:mobile/pages/seller/vehicle/edit/editvehicle.dart';
 import 'package:mobile/utils/storage.dart';
 
 import 'pages/account/account.dart';
@@ -63,6 +63,8 @@ class MyApp extends StatelessWidget {
           labelStyle: TextStyle(color: Colors.black),
           floatingLabelStyle: TextStyle(color: Colors.black),
         ),
+        progressIndicatorTheme:
+            const ProgressIndicatorThemeData(color: Colors.black),
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),

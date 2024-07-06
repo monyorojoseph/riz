@@ -2,15 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mobile/classes/pageargs/editvehicle.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/editvehiclebasic.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/editvehicledetails.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/editvehicleimages.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/editvehicleoverview.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/editvehiclerates.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/editvehiclerules.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehiclebasic.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicledetails.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicleimages.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicleoverview.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehiclerates.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehiclerules.dart';
+import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicleverification.dart';
 import 'package:mobile/services/vehicle.dart';
 
-enum EditSteps { overview, basic, details, images, rates, rules }
+enum EditSteps {
+  overview,
+  basic,
+  details,
+  images,
+  rates,
+  rules,
+  verification,
+  // standards
+}
 
 class EditVehiclePage extends HookWidget {
   const EditVehiclePage({super.key});
@@ -47,6 +57,9 @@ class EditVehiclePage extends HookWidget {
           return EditVehicleRates(vehicle: vehicle.data!);
         case EditSteps.rules:
           return EditVehicleRules(vehicle: vehicle.data!);
+
+        case EditSteps.verification:
+          return EditVehicleVerification(vehicle: vehicle.data!);
         default:
           return EditVehicleOverview(
             currentPage: currentPage,
@@ -54,6 +67,7 @@ class EditVehiclePage extends HookWidget {
           );
       }
     }, [currentPage.value]);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Vehicle"),

@@ -5,7 +5,7 @@ import 'package:image_field/image_field.dart';
 import 'package:image_field/linear_progress_indicator_if.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
 import 'package:mobile/services/url.dart';
 import 'package:mobile/services/utils.dart';
 

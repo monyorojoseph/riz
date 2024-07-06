@@ -62,6 +62,7 @@ class LandVehicleShemaIn(Schema):
     transmission: str
     drivetrain: Optional[str] = None
     type: str
+    mileage: int
 
 class OverviewMessage(Schema):
     stage: str

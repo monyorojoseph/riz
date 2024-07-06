@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
 import 'package:mobile/services/vehicle.dart';
 
 class CreateVehicleLast extends HookWidget {
@@ -46,7 +46,7 @@ class CreateVehicleLast extends HookWidget {
             padding: const EdgeInsets.symmetric(vertical: 7.5),
             color: Colors.black,
             onPressed: () {
-              currentPage.value = CreateSteps.rates;
+              currentPage.value = CreateSteps.verification;
             },
             child: const Text(
               'Back',

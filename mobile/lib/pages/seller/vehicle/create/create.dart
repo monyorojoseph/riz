@@ -2,14 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:mobile/classes/pageargs/editvehicle.dart';
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/vehiclebasic.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/vehicledetails.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/vehicleimages.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/vehicleintro.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/vehiclerates.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/create/vehiclesubmit.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclebasic.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehicledetails.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleimages.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleintro.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclerates.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclerules.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclesubmit.dart';
+import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleverification.dart';
+import 'package:mobile/pages/seller/vehicle/widgets/vehiclerulesform.dart';
+import 'package:mobile/pages/seller/vehicle/widgets/vehicleverificationform.dart';
 
-enum CreateSteps { intro, basic, details, images, rates, rules, last }
+enum CreateSteps {
+  intro,
+  basic,
+  details,
+  images,
+  rates,
+  rules,
+  verification,
+  last
+}
 
 class CreateVehiclePage extends HookWidget {
   const CreateVehiclePage({super.key});
@@ -45,6 +58,11 @@ class CreateVehiclePage extends HookWidget {
             currentPage: currentPage,
             vehicle: vehicle,
           );
+        case CreateSteps.rules:
+          return VehicleRules(currentPage: currentPage, vehicle: vehicle);
+        case CreateSteps.verification:
+          return VehicleVerification(
+              currentPage: currentPage, vehicle: vehicle);
         case CreateSteps.last:
           return CreateVehicleLast(
             currentPage: currentPage,

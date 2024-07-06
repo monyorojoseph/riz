@@ -8,6 +8,7 @@ from django.core.validators import MaxLengthValidator
 from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, AFTER_CREATE, AFTER_DELETE
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 class UserManager(BaseUserManager):
@@ -50,8 +51,6 @@ class User(LifecycleModelMixin, AbstractBaseUser):
 
     sex = models.CharField(default=NONE, choices=SEX_CHOICES)
     profilePicture = models.ImageField(null=True, blank=True, upload_to='profile_picture')
-    idImage = models.ImageField(null=True, blank=True, upload_to='id_images')
-    idNumber = models.CharField(null=True, blank=True, max_length=15, unique=True)
     verified = models.BooleanField(default=False)
     joinedOn = models.DateTimeField(auto_now_add=True)
 
@@ -77,8 +76,18 @@ class User(LifecycleModelMixin, AbstractBaseUser):
         return self.is_admin
     
     @hook(AFTER_CREATE, on_commit=True)
-    def create_user_settings(self):
+    def after_create_actions(self):
         user_setting = UserSetting.objects.create(user=self)
+        user_verification = UserVerification.objects.create(user=self)
+
+class UserVerification(models.Model):
+    user = models.OneToOneField("User", on_delete=models.CASCADE, related_name='verification')
+    dlVerified = models.BooleanField(default=False)
+    idVerificationImage = models.ImageField(null=True, blank=True, upload_to='identificationimages')
+    idVerificationNumber = models.CharField(null=True, blank=True, max_length=15, unique=True)
+    dlVerificationImage = models.ImageField(null=True, blank=True, upload_to='dlidentificationimages')
+    dlVerificationNumber = models.CharField(null=True, blank=True, max_length=15, unique=True)
+
 
 class TokenBase(models.Model):
     token = models.CharField(unique=True, max_length=8)
@@ -177,6 +186,12 @@ class Vehicle(LifecycleModelMixin, models.Model):
     def __str__(self) -> str:
         return f"{self.brand} {self.model}" 
     
+    @hook(AFTER_CREATE, on_commit=True)
+    def after_create_actions(self):
+        rules = VehicleRules.objects.create(vehicle=self)
+        verification = VehicleVerification.objects.create(vehicle=self)
+
+    
     @hook(AFTER_DELETE)
     def remove_related_content(self):
         self.contentObject.delete()
@@ -185,6 +200,28 @@ class VehicleImage(models.Model):
     vehicle = models.ForeignKey('Vehicle', related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='vehicles')
     coverImage = models.BooleanField(default=False)
+
+class VehicleVerification(models.Model):
+    vehicle = models.OneToOneField("Vehicle", on_delete=models.CASCADE, related_name='verification')
+    proofOfOwnership = models.BooleanField(default=False)
+    ownershipDocuments = models.ImageField(upload_to='vehicledocuments', null=True, blank=True, 
+                                        help_text="to prove you're the owner of th vehicle")
+    roadSafe = models.BooleanField(default=False)
+    inspectionDocuments = models.ImageField(upload_to='vehicledocuments', null=True, blank=True)
+    # safetyRequirements = models.JSONField(default=dict, encoder=DjangoJSONEncoder, 
+    #                                       help_text='e.g the vehicle is safe for the road or inspetion record')
+
+
+class VehicleRules(models.Model):
+    vehicle = models.OneToOneField("Vehicle", on_delete=models.CASCADE, related_name="rules")
+    deposit = models.BooleanField(default=False)
+    latePenalty = models.BooleanField(default=False)
+    geographicLimit = models.BooleanField(default=False)
+    verifiedUser = models.BooleanField(default=True)
+    verifiedDl = models.BooleanField(default=False)
+    prohibitedUses = models.JSONField(default=dict, encoder=DjangoJSONEncoder)
+    # payUpfront = models.BooleanField(default=False)
+
 
 class LandVehicleTypes(models.TextChoices):
     BICYCLE = 'BCE', _("Bicycle")
@@ -224,6 +261,8 @@ class LandVehicle(models.Model):
     doors = models.PositiveIntegerField(null=True, blank=True)
     passengers = models.PositiveIntegerField(default=1)
     load = models.PositiveIntegerField()
+    mileage = models.PositiveIntegerField()
+
     
     DIESEL = "DSL"
     PETROL = "PTL"

@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
 import 'package:mobile/services/user.dart';
 import 'package:mobile/services/vehicle.dart';
 

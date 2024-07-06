@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mobile/classes/vehicle.dart';
 import 'package:mobile/constants/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
 import 'package:mobile/services/vehicle.dart';
 
 class CreateVehicleDetails extends HookWidget {
@@ -144,8 +144,17 @@ class CreateVehicleDetails extends HookWidget {
               const SizedBox(height: 10),
               FormBuilderTextField(
                 name: 'load',
+                decoration: const InputDecoration(
+                    labelText: 'Load it can carry ( kg )'),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                ]),
+              ),
+              const SizedBox(height: 10),
+              FormBuilderTextField(
+                name: 'mileage',
                 decoration:
-                    const InputDecoration(labelText: 'Load it can carry'),
+                    const InputDecoration(labelText: 'Current mileage ( km )'),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
@@ -187,6 +196,7 @@ class CreateVehicleDetails extends HookWidget {
                             'fuelType': formData['fuelType'].toString(),
                             'transmission': formData['transmission'].toString(),
                             'drivetrain': formData['drivetrain'].toString(),
+                            'mileage': formData['mileage'].toString(),
                             'type': formData['type'].toString(),
                           };
 

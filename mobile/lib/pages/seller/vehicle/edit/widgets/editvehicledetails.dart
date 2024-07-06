@@ -164,8 +164,17 @@ class EditVehicleDetails extends HookWidget {
                   FormBuilderTextField(
                     name: 'load',
                     initialValue: landvehicle.data?.load.toString(),
-                    decoration:
-                        const InputDecoration(labelText: 'Load it can carry'),
+                    decoration: const InputDecoration(
+                        labelText: 'Load it can carry ( kg )'),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  const SizedBox(height: 10),
+                  FormBuilderTextField(
+                    name: 'mileage',
+                    decoration: const InputDecoration(
+                        labelText: 'Current mileage ( km )'),
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(),
                     ]),
@@ -188,6 +197,7 @@ class EditVehicleDetails extends HookWidget {
                             'fuelType': formData['fuelType'].toString(),
                             'transmission': formData['transmission'].toString(),
                             'drivetrain': formData['drivetrain'].toString(),
+                            'mileage': formData['mileage'].toString(),
                             'type': formData['type'].toString(),
                           };
                           try {

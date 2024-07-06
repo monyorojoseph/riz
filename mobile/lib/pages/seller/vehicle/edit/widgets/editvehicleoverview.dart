@@ -5,8 +5,8 @@ import 'package:fquery/fquery.dart';
 import 'package:mobile/classes/pageargs/editvehicle.dart';
 import 'package:mobile/classes/utils.dart';
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
-import 'package:mobile/pages/seller/vehicle/editvehicle.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
+import 'package:mobile/pages/seller/vehicle/edit/editvehicle.dart';
 import 'package:mobile/services/url.dart';
 import 'package:mobile/services/utils.dart';
 import 'package:mobile/services/vehicle.dart';
@@ -127,19 +127,7 @@ class EditVehicleOverview extends HookWidget {
         ),
         GestureDetector(
           onTap: () {
-            final bool passed = vehicleOverview.data
-                    ?.where((element) => element.stage == "rates")
-                    .first
-                    .passed ??
-                false;
-
-            if (passed) {
-              currentPage.value = EditSteps.rates;
-            } else {
-              Navigator.pushNamed(context, CreateVehiclePage.routeName,
-                  arguments: CreateVehiclePageArgs(
-                      vehicle: vehicle, page: CreateSteps.rates));
-            }
+            currentPage.value = EditSteps.rates;
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 7),
@@ -158,19 +146,7 @@ class EditVehicleOverview extends HookWidget {
         ),
         GestureDetector(
           onTap: () {
-            final bool passed = vehicleOverview.data
-                    ?.where((element) => element.stage == "rules")
-                    .first
-                    .passed ??
-                false;
-
-            if (passed) {
-              currentPage.value = EditSteps.rules;
-            } else {
-              Navigator.pushNamed(context, CreateVehiclePage.routeName,
-                  arguments: CreateVehiclePageArgs(
-                      vehicle: vehicle, page: CreateSteps.rules));
-            }
+            currentPage.value = EditSteps.rules;
           },
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 7),
@@ -179,7 +155,26 @@ class EditVehicleOverview extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "Vehicles rules",
+                  "Vehicle rules",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                Icon(Icons.arrow_forward_ios)
+              ],
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            currentPage.value = EditSteps.verification;
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 7),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Vehicle verification",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 Icon(Icons.arrow_forward_ios)

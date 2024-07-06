@@ -1,5 +1,5 @@
 import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create.dart';
+import 'package:mobile/pages/seller/vehicle/create/create.dart';
 
 class EditVehiclePageArgs {
   final String id;
