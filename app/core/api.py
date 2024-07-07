@@ -14,9 +14,9 @@ from ninja_jwt.tokens import RefreshToken
 from ninja.responses import codes_4xx
 
 # from .utils import gen_shop_membeship_join_token
-from .models import LandVehicle, Pricing, User, UserAuthToken, UserSetting, Vehicle, VehicleBrand, VehicleImage, VehicleModel
+from .models import LandVehicle, Pricing, User, UserAuthToken, UserSetting, UserVerification, Vehicle, VehicleBrand, VehicleImage, VehicleModel, VehicleRules, VehicleVerification
 from .schema import Error, LandVehicleShema, LandVehicleShemaIn, LogoutSchema, MyTokenObtainPairOutSchema, OverviewMessage, PricingSchema, PricingSchemaIn, SlimUserSchema, UpdateUserSettingSchema \
-    ,UserSchema, UpdateUserSchema, UserSettingSchema, VehicleBrandSchema, VehicleImageSchema, VehicleModelSchema, VehicleSchema, VehicleSchemaIn 
+    ,UserSchema, UpdateUserSchema, UserSettingSchema, UserVerficationSchema, VehicleBrandSchema, VehicleImageSchema, VehicleModelSchema, VehicleRulesSchema, VehicleRulesSchemaIn, VehicleSchema, VehicleSchemaIn, VehicleVerificationSchema 
 from .tasks import send_email_auth_token
 
 
@@ -112,15 +112,6 @@ class UserAPI:
         return user
     
 
-    # uplod profile picture 
-    @route.post("verify", response=SlimUserSchema)
-    def verification(self, request, file: UploadedFile = File(...)):
-        user = request.user
-        id_img = STORAGE.save(file.name, file)
-        # process the image
-        return user
-    
-
     # delete account
     @route.delete("delete")
     def remove(self, request):
@@ -133,52 +124,34 @@ class UserAPI:
     def my_listed_vehicles(self, request):
         queryset = request.user.vehicles.all()
         return queryset
-    
-    # # user orders 
-    # @route.get("orders", response=List[OrderSchema])
-    # def my_orders(self, request):
-    #     queryset = request.user.orders.all()
-    #     return queryset
-    # #  order outs
-    # @route.get("out-order", response=List[OrderOutSchema])
-    # def my_out_orders(self, request):
-    #     queryset = OrderOut.objects.filter(order__user=request.user)
-    #     return queryset
-    
-    # # user /payments
-    # @route.get("payments", response=List[PaymentSchema])
-    # def my_payments(self, request):
-    #     queryset = Payment.objects.filter(order__user=request.user)
-    #     return queryset
-    
-    # # transaction
-    # @route.get("transactions", response=List[TransactionSchema])
-    # def my_transactions(self, request):
-    #     queryset = Transaction.objects.filter(
-    #         sentFromObject = ContentType.objects.get_for_model(User),
-    #         sentFromObjectId = request.user.id,
-    #         sentToObject = ContentType.objects.get_for_model(User),
-    #         sentToObjectId = request.user.id
-    #     )
-    #     return queryset
-
-    
-    # # user wallet
-    # @route.get("wallet", response=UserWalletSchema)
-    # def my_wallet(self, request):
-        # transactions = Transaction.objects.filter(
-        #     sentFromObject = ContentType.objects.get_for_model(User),
-        #     sentFromObjectId = request.user.id,
-        #     sentToObject = ContentType.objects.get_for_model(User),
-        #     sentToObjectId = request.user.id
-        # )
-        # data = {
-        #     "wallet": request.user.wallet,
-        #     "transactions": transactions
-        # }
-        # return data
            
 api.register_controllers(UserAPI)
+
+@api_controller("user-verification/", tags=["User Verification"], auth= JWTAuth())
+class UserVerificationAPI:
+    # id verification
+    @route.post("identity", response=UserVerficationSchema)
+    def identity_verification(self, request, file: UploadedFile = File(...)):
+        user = request.user
+        id_img = STORAGE.save(file.name, file)
+        # TODO process the image
+        return user
+    
+    # dl verification
+    @route.post("driving-license", response=UserVerficationSchema)
+    def driving_license_verification(self, request, file: UploadedFile = File(...)):
+        user = request.user
+        id_img = STORAGE.save(file.name, file)
+        # TODO process the image
+        return user
+    
+    # user verification details
+    @route.post("{str:user_id}", response=UserVerficationSchema)
+    def get_user_verification_details(self, request, user_id):
+        user_verification = UserVerification.objects.get(user_id=user_id)
+        return user_verification
+
+api.register_controllers(UserVerificationAPI)
 
 @api_controller("user-settings/", tags=["User Setting"], auth= JWTAuth())
 class UserSettingsAPI: 
@@ -307,9 +280,14 @@ class VehicleAPI:
 
         return data
 
-    """ IMAGES """
+
+api.register_controllers(VehicleAPI)
+
+# vehicle images
+@api_controller("vehicle-images/", tags=["Vehicle Images"])
+class VehicleImagesAPI:
     # create vehicle images
-    @route.post(path="{str:id}/create-images", response=VehicleSchema, auth=JWTAuth())
+    @route.post(path="{str:id}/create", response=VehicleSchema, auth=JWTAuth())
     def create_vehicle_images(self, request, id, files: File[list[UploadedFile]]):
         vehicle = Vehicle.objects.get(id=id)
         imgs = [ VehicleImage(vehicle=vehicle, image=file) for file in files ]
@@ -317,26 +295,76 @@ class VehicleAPI:
         return vehicle
     
     # list vehicle images
-    @route.get("{str:id}/images", response=List[VehicleImageSchema])
+    @route.get("{str:id}", response=List[VehicleImageSchema])
     def vehicle_images(self, request, id):
         images = VehicleImage.objects.filter(vehicle_id=id)
         return images
     
-    """ PRICING """
+api.register_controllers(VehicleImagesAPI)
+
+# vehicle pricing
+@api_controller("vehicle-pricing/", tags=["Vehicle Pricing"])
+class VehiclePricingAPI:
     # create pricing
-    @route.post("create-pricing", response=PricingSchema)
+    @route.post("create", response=PricingSchema, auth=JWTAuth())
     def create_pricing(self, request, data: PricingSchemaIn):
         pricing = Pricing.objects.create(**data.dict())
         return pricing
     
     # list pricing
-    @route.get("{str:id}/pricing", response=List[PricingSchema])
-    def vehicle_pricing(self, request, id):
-        pricings = Pricing.objects.filter(vehicle_id=id)
+    @route.get("{str:vehicle_id}", response=List[PricingSchema])
+    def vehicle_pricing(self, request, vehicle_id):
+        pricings = Pricing.objects.filter(vehicle_id=vehicle_id)
         return pricings
 
+api.register_controllers(VehiclePricingAPI)
     
-api.register_controllers(VehicleAPI)
+
+# vehicle rules
+@api_controller("vehicle-rules/", tags=["Vehicle Rules"])
+class VehicleRulesAPI:
+    # get pricing
+    @route.get("{str:vehicle_id}", response=VehicleRulesSchema)
+    def get_vehicle_rules(self, request, vehicle_id):
+        rules = VehicleRules.objects.get(vehicle_id=vehicle_id)
+        return rules
+    
+    # update pricing
+    @route.put("{str:id}/update", response=VehicleRulesSchema, auth=JWTAuth())
+    def update_vehicle_rules(self, request, id, data: VehicleRulesSchemaIn):
+        rules = VehicleRules.objects.get(id=id)
+        for attr, value in data.dict(exclude_unset=True).items():
+            setattr(rules, attr, value)
+        rules.save()
+        return rules
+
+api.register_controllers(VehicleRulesAPI)
+
+# vehicle verification
+@api_controller("vehicle-verification/", tags=["Vehicle Verification"])
+class VehicleVerificationAPI:
+    # get details
+    @route.get("{str:vehicle_id}", response=VehicleVerificationSchema)
+    def get_vehicle_verification(self, request, vehicle_id):
+        vehicle_verification = VehicleVerification.objects.get(vehicle_id=vehicle_id)
+        return vehicle_verification
+    
+
+    # upload ownership docs / prove of ownership
+    @route.post("{str:id}/prove-ownership", response=VehicleVerificationSchema, auth=JWTAuth())
+    def prove_ownership(self, request, id, file):
+        vehicle_verification = VehicleVerification.objects.get(id=id)
+        # TODO check if documents are valid
+        return vehicle_verification
+
+    # upload inspection docs / prove of road safety
+    @route.post("{str:id}/road-safety-inspection", response=VehicleVerificationSchema, auth=JWTAuth())
+    def road_safety_inspection(self, request, id, file):
+        vehicle_verification = VehicleVerification.objects.get(id=id)
+        # TODO check if documents are valid
+        return vehicle_verification
+
+api.register_controllers(VehicleVerificationAPI)
 
 # land vehicle
 @api_controller("land-vehicle/", tags=["Land Vehicle"], auth=JWTAuth())

@@ -2,7 +2,8 @@ from datetime import date
 from typing import Optional, Type
 from ninja.orm import create_schema
 from ninja import Schema, ModelSchema
-from .models import LandVehicle, Pricing, User, UserSetting, Vehicle, VehicleImage, VehicleBrand, VehicleModel
+from .models import LandVehicle, Pricing, User, UserSetting, UserVerification, Vehicle, VehicleImage, VehicleBrand, VehicleModel, \
+    VehicleRules, VehicleVerification
 
 """ User """
 SlimUserSchema = create_schema(User, fields=['email', 'fullName', 'id', 'verifiedEmail', 'verified'])
@@ -22,6 +23,7 @@ UserSettingSchema = create_schema(model=UserSetting)
 UpdateUserSettingSchema = create_schema(model=UserSetting, fields=['appPurpose', 'currentScreen'], \
                             optional_fields=['appPurpose', 'currentScreen'])
 
+UserVerficationSchema = create_schema(UserVerification)
 
 """ Vehicle """
 VehicleBrandSchema = create_schema(model=VehicleBrand)
@@ -69,6 +71,18 @@ class OverviewMessage(Schema):
     message: str
     passed: bool
     
+
+VehicleRulesSchema = create_schema(VehicleRules)
+
+class VehicleRulesSchemaIn(Schema):
+    deposit: Optional[bool]
+    latePenalty: Optional[bool]
+    geographicLimit: Optional[bool]
+    verifiedUser: Optional[bool]
+    verifiedDl: Optional[bool]
+    prohibitedUses: Optional[dict]
+
+VehicleVerificationSchema = create_schema(VehicleVerification)
 
 """ PRICING """
 PricingSchema = create_schema(Pricing)

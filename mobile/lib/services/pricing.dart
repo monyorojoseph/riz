@@ -7,7 +7,7 @@ import 'package:mobile/services/utils.dart';
 
 Future<Pricing> createVehiclePricing(Map<String, dynamic> data) async {
   final response = await appService.genericPost(
-      true, '$baseUrl/vehicle/create-pricing', data);
+      true, '$baseUrl/vehicle-pricing/create', data);
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -19,7 +19,7 @@ Future<Pricing> createVehiclePricing(Map<String, dynamic> data) async {
 
 Future<List<Pricing>> vehiclePricings(String id) async {
   final response =
-      await appService.genericGet(true, '$baseUrl/vehicle/$id/pricing');
+      await appService.genericGet(true, '$baseUrl/vehicle-pricing/$id');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);

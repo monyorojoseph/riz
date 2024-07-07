@@ -81,7 +81,7 @@ class CreateVehicleImages extends HookWidget {
                   String? vId = vehicle.value?.id;
                   if (vId?.isNotEmpty ?? false) {
                     isLoading.value = true;
-                    String url = '$baseUrl/vehicle/$vId/create-images';
+                    String url = '$baseUrl/vehicle-images/$vId/create';
                     StreamedResponse streamResponse =
                         await appService.uploadImages(url, pickedFiles.value!);
                     isLoading.value = false;

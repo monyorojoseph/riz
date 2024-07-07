@@ -92,7 +92,7 @@ Future<List<Vehicle>> myListedVehicles() async {
 // my listed vehicles
 Future<List<VehicleImage>> vehicleImages(String id) async {
   final response =
-      await appService.genericGet(true, '$baseUrl/vehicle/$id/images');
+      await appService.genericGet(true, '$baseUrl/vehicle-images/$id');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);
