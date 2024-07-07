@@ -19,7 +19,7 @@ Future<Pricing> createVehiclePricing(Map<String, dynamic> data) async {
 
 Future<List<Pricing>> vehiclePricings(String id) async {
   final response =
-      await appService.genericGet(true, '$baseUrl/vehicle-pricing/$id');
+      await appService.genericGet(true, '$baseUrl/vehicle-pricing/$id/all');
 
   if (response.statusCode == 200) {
     final List<dynamic> responseData = jsonDecode(response.body);

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
@@ -60,7 +61,7 @@ class AccountPage extends StatelessWidget {
                     ),
                     SizedBox(width: 20),
                     Text(
-                      "Identity Verification",
+                      "Verification",
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -127,9 +128,28 @@ class UserDetails extends HookWidget {
     final user = useQuery(['userDetails'], getUserDetails);
     return Column(
       children: <Widget>[
-        const CircleAvatar(
-          maxRadius: 50,
-          backgroundImage: AssetImage('assets/defaults/user.jpg'),
+        Stack(
+          children: <Widget>[
+            const CircleAvatar(
+              maxRadius: 60,
+              backgroundImage: AssetImage('assets/defaults/user.jpg'),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles();
+                },
+                child: const Icon(
+                  Icons.image,
+                  size: 30,
+                  color: Colors.black54,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
         Row(

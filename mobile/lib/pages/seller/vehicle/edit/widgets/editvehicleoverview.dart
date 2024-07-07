@@ -31,8 +31,8 @@ class EditVehicleOverview extends HookWidget {
       );
     }
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Text(
           "Vehicle details",
@@ -155,7 +155,7 @@ class EditVehicleOverview extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "Vehicle rules",
+                  "Vehicle rental policy",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 Icon(Icons.arrow_forward_ios)

@@ -9,11 +9,6 @@ class EditVehicleRates extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: VehiclePriceRatesForm(vehicle: vehicle),
-      ),
-    );
+    return VehiclePriceRatesForm(vehicle: vehicle);
   }
 }

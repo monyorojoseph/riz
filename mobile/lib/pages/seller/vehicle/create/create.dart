@@ -10,8 +10,6 @@ import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclerates.dart';
 import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclerules.dart';
 import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclesubmit.dart';
 import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleverification.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/vehiclerulesform.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/vehicleverificationform.dart';
 
 enum CreateSteps {
   intro,
@@ -76,9 +74,11 @@ class CreateVehiclePage extends HookWidget {
     }, [currentPage.value]);
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-        child: selectedPage,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+          child: selectedPage,
+        ),
       ),
     );
   }

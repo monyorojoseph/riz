@@ -85,7 +85,12 @@ class EditVehiclePage extends HookWidget {
           },
         ),
       ),
-      body: selectedPage,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+          child: selectedPage,
+        ),
+      ),
     );
   }
 }

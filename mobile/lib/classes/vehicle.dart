@@ -113,6 +113,7 @@ class LandVehicle {
   final String transmission;
   final String? drivetrain;
   final String type;
+  final int mileage;
 
   LandVehicle(
       {required this.id,
@@ -124,7 +125,8 @@ class LandVehicle {
       this.drivetrain,
       required this.fuelType,
       required this.transmission,
-      required this.type});
+      required this.type,
+      required this.mileage});
 
   factory LandVehicle.fromJson(Map<String, dynamic> json) {
     return LandVehicle(
@@ -137,7 +139,8 @@ class LandVehicle {
         drivetrain: json['drivetrain'].toString(),
         fuelType: json['fuelType'].toString(),
         transmission: json['transmission'].toString(),
-        type: json['type'].toString());
+        type: json['type'].toString(),
+        mileage: json['mileage']);
   }
 
   // Map<String, dynamic> toJson() {

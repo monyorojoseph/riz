@@ -72,15 +72,18 @@ class OverviewMessage(Schema):
     passed: bool
     
 
-VehicleRulesSchema = create_schema(VehicleRules)
+VehicleRulesSchema = create_schema(
+    VehicleRules, 
+    fields=['id', 'vehicle', 'latePenalty' ,'verifiedUser','verifiedDl']
+    )
 
 class VehicleRulesSchemaIn(Schema):
-    deposit: Optional[bool]
+    # deposit: Optional[bool]
     latePenalty: Optional[bool]
-    geographicLimit: Optional[bool]
+    # geographicLimit: Optional[bool]
     verifiedUser: Optional[bool]
     verifiedDl: Optional[bool]
-    prohibitedUses: Optional[dict]
+    # prohibitedUses: Optional[dict]
 
 VehicleVerificationSchema = create_schema(VehicleVerification)
 

@@ -9,11 +9,12 @@ class CreateVehicleIntro extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Row(
           children: <Widget>[
             Text(
-              "How to start listing",
+              "How to Start Listing",
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
@@ -23,57 +24,88 @@ class CreateVehicleIntro extends HookWidget {
         ),
         const SizedBox(height: 40),
         const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Talk about your vehicle",
+              "Talk About Your Vehicle",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
+            SizedBox(height: 5),
             Text(
-                "Provide basic info like vehicle specs, load capacity, number of passengers")
+              "Provide basic information about your vehicle, such as specifications, load capacity, and number of passengers.",
+            ),
           ],
         ),
         const SizedBox(height: 20),
         const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Vehicle images",
+              "Vehicle Images",
               textWidthBasis: TextWidthBasis.parent,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Text("Add vehicle images to make it standout")
+            SizedBox(height: 5),
+            Text(
+              "Add high-quality images of your vehicle to make it stand out.",
+            ),
           ],
         ),
         const SizedBox(height: 20),
         const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Renting rates",
+              "Rental Rates",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Text("Set your renting rates")
+            SizedBox(height: 5),
+            Text(
+              "Set your rental rates for potential renters.",
+            ),
           ],
         ),
         const SizedBox(height: 20),
         const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Finish up and publish",
+              "Vehicle Verification",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
+            SizedBox(height: 5),
             Text(
-                "Make sure your identity is verified first, set who can rent your vehicle")
+              "Provide proof of vehicle ownership, road safety compliance, and maintenance history.",
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "Rental Policy",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text(
+              "Set policies regarding who can rent your vehicle, such as requiring a valid driving license or identity verification.",
+            ),
           ],
         ),
         const SizedBox(height: 50),
@@ -87,7 +119,10 @@ class CreateVehicleIntro extends HookWidget {
           child: const Text(
             'Start',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
         ),
       ],

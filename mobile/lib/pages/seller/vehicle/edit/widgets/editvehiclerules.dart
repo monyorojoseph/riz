@@ -9,11 +9,6 @@ class EditVehicleRules extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: VehicleRentRulesForm(vehicle: vehicle),
-      ),
-    );
+    return VehicleRentRulesForm(vehicle: vehicle);
   }
 }

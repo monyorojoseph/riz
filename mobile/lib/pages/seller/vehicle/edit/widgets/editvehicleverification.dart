@@ -9,11 +9,6 @@ class EditVehicleVerification extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: VehicleVerficationForm(vehicle: vehicle),
-      ),
-    );
+    return VehicleVerficationForm(vehicle: vehicle);
   }
 }

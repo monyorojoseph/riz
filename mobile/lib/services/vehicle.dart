@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:mobile/classes/vehicle.dart';
+import 'package:mobile/classes/vehiclerentalpolicy.dart';
 import 'package:mobile/services/url.dart';
 import 'package:mobile/services/utils.dart';
 import 'package:image_picker/image_picker.dart';
@@ -165,3 +167,33 @@ Future<LandVehicle> updateLandVehicle(
     throw Exception('Failed to update land vehicle details.');
   }
 }
+
+// get vehicle rental policy
+Future<VehicleRentalPolicy> vehicleRentalPolicy(String vehicleId) async {
+  final response =
+      await appService.genericGet(true, '$baseUrl/vehicle-rules/$vehicleId');
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    return VehicleRentalPolicy.fromJson(responseData);
+  } else {
+    throw Exception('Failed to get vehicle rental policy');
+  }
+}
+
+// update vehicle rental policy
+Future<VehicleRentalPolicy> updateVehicleRentalPolicy(
+    String id, Map<String, dynamic> data) async {
+  final response =
+      await appService.genericPut('$baseUrl/vehicle-rules/$id/update', data);
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    return VehicleRentalPolicy.fromJson(responseData);
+  } else {
+    throw Exception('Failed to get vehicle rental policy');
+  }
+}
+// vehicle verification
+// vehicle prove of ownership docs
+// vehicle inspection docs

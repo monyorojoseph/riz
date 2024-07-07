@@ -17,9 +17,10 @@ class VehiclePriceRatesForm extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final queryClient = useQueryClient();
     final isLoading = useState<bool>(false);
-    final usepricings =
-        useQuery(['vehicle-pricings'], () => vehiclePricings(vehicle.id));
+    final usepricings = useQuery(
+        ['vehicle-pricings-${vehicle.id}'], () => vehiclePricings(vehicle.id));
     final pricings = useState<List<Pricing>>([]);
 
     useEffect(() {
@@ -92,7 +93,14 @@ class VehiclePriceRatesForm extends HookWidget {
                           isLoading.value = true;
                           final pricing = await createVehiclePricing(data);
                           isLoading.value = false;
-                          pricings.value.add(pricing);
+                          // pricings.value.add(pricing);
+                          // manual add it to others
+                          queryClient.setQueryData<List<Pricing>>(
+                              ['vehicle-pricings-${vehicle.id}'], (previous) {
+                            return previous != null
+                                ? [...previous, pricing]
+                                : [pricing];
+                          });
                           _formKey.currentState?.reset();
                           // currentPage.value = CreateSteps.last;
                         } catch (e) {

@@ -312,10 +312,26 @@ class VehiclePricingAPI:
         return pricing
     
     # list pricing
-    @route.get("{str:vehicle_id}", response=List[PricingSchema])
-    def vehicle_pricing(self, request, vehicle_id):
+    @route.get("{str:vehicle_id}/all", response=List[PricingSchema])
+    def vehicle_pricings(self, request, vehicle_id):
         pricings = Pricing.objects.filter(vehicle_id=vehicle_id)
         return pricings
+    
+    # update
+    @route.put("{str:id}", response=PricingSchema, auth=JWTAuth())
+    def update_vehicle_pricing(self, request, id, data: PricingSchemaIn):
+        pricing = Pricing.objects.get(id=id)
+        for attr, value in data.dict(exclude_unset=True).items():
+            setattr(pricing, attr, value)
+        pricing.save()
+        return pricing
+    
+    # remove
+    @route.delete("{str:id}")
+    def remove_vehicle_pricing(self, request, id):
+        pricing = Pricing.objects.get(id=id)
+        pricing.delete()
+        return 200
 
 api.register_controllers(VehiclePricingAPI)
     

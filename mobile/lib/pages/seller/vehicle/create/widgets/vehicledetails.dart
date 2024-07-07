@@ -200,7 +200,7 @@ class CreateVehicleDetails extends HookWidget {
                             'type': formData['type'].toString(),
                           };
 
-                          debugPrint(data.toString());
+                          // debugPrint(data.toString());
 
                           try {
                             final vId = vehicle.value?.id;
