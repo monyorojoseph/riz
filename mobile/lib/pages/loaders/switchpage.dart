@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/classes/user.dart';
-import 'package:mobile/pages/home/home.dart';
-import 'package:mobile/pages/seller/home.dart';
-import 'package:mobile/services/user.dart';
+import 'package:acruda/classes/user.dart';
+import 'package:acruda/pages/home/home.dart';
+import 'package:acruda/pages/seller/home.dart';
+import 'package:acruda/services/user.dart';
 
 class SwitchLoaderPage extends HookWidget {
   const SwitchLoaderPage({super.key});

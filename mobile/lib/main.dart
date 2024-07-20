@@ -1,25 +1,28 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/pages/account/editprofile.dart';
-import 'package:mobile/pages/account/listvehicle.dart';
-import 'package:mobile/pages/account/usersettings.dart';
-import 'package:mobile/pages/account/verification.dart';
-import 'package:mobile/pages/auth/login.dart';
-import 'package:mobile/pages/auth/register.dart';
-import 'package:mobile/pages/auth/verification.dart';
-import 'package:mobile/pages/home/home.dart';
-import 'package:mobile/pages/loaders/mainpage.dart';
-import 'package:mobile/pages/loaders/switchpage.dart';
-import 'package:mobile/pages/notifications/notifications.dart';
-import 'package:mobile/pages/seller/calendar.dart';
-import 'package:mobile/pages/seller/home.dart';
-import 'package:mobile/pages/seller/menu.dart';
-import 'package:mobile/pages/seller/notifications.dart';
-import 'package:mobile/pages/seller/vehicle/create/create.dart';
-import 'package:mobile/pages/seller/vehicle/edit/editvehicle.dart';
-import 'package:mobile/utils/storage.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:acruda/pages/account/editprofile.dart';
+import 'package:acruda/pages/account/listvehicle.dart';
+import 'package:acruda/pages/account/usersettings.dart';
+import 'package:acruda/pages/account/verification.dart';
+import 'package:acruda/pages/auth/login.dart';
+import 'package:acruda/pages/auth/register.dart';
+import 'package:acruda/pages/auth/verification.dart';
+import 'package:acruda/pages/home/home.dart';
+import 'package:acruda/pages/loaders/mainpage.dart';
+import 'package:acruda/pages/loaders/switchpage.dart';
+import 'package:acruda/pages/notifications/notifications.dart';
+import 'package:acruda/pages/seller/calendar.dart';
+import 'package:acruda/pages/seller/home.dart';
+import 'package:acruda/pages/seller/menu.dart';
+import 'package:acruda/pages/seller/notifications.dart';
+import 'package:acruda/pages/seller/vehicle/create/create.dart';
+import 'package:acruda/pages/seller/vehicle/edit/editvehicle.dart';
+import 'package:acruda/utils/storage.dart';
 
 import 'pages/account/account.dart';
 import 'pages/history/history.dart';
@@ -28,6 +31,10 @@ final queryClient = QueryClient(
   defaultQueryOptions: DefaultQueryOptions(),
 );
 void main() {
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('google_fonts/UFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
   runApp(QueryClientProvider(queryClient: queryClient, child: MyApp()));
 }
 
@@ -67,13 +74,22 @@ class MyApp extends StatelessWidget {
           focusColor: Colors.black,
           labelStyle: TextStyle(color: Colors.black),
           floatingLabelStyle: TextStyle(color: Colors.black),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.black, // border color when focused
+              width: 2.0,
+            ),
+          ),
+        ),
+        textTheme: GoogleFonts.ubuntuTextTheme(
+          ThemeData.light().textTheme,
         ),
         progressIndicatorTheme:
             const ProgressIndicatorThemeData(color: Colors.black),
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
-      // initialRoute: LoginPage.routeName,
+      // initialRoute: HomePage.routeName,
       onGenerateInitialRoutes: _onGenerateInitialRoutes,
       routes: {
         HomePage.routeName: (context) => const HomePage(),
@@ -134,6 +150,7 @@ class MyApp extends StatelessWidget {
             tokens.containsKey('refreshToken')) {
           // Tokens are available, navigate to Home page
           // return const HomePage(); // Replace with logic based on tokens if needed
+          // debugPrint("[ TOKENS AVAILABLE ]");
           return const MainLoaderPage();
         } else {
           // Tokens are not available or invalid, navigate to Login page

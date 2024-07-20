@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:mobile/classes/auth.dart';
-import 'package:mobile/classes/pageargs/authverification.dart';
-import 'package:mobile/pages/auth/login.dart';
-import 'package:mobile/pages/auth/verification.dart';
-import 'package:mobile/services/auth.dart';
+import 'package:acruda/classes/auth.dart';
+import 'package:acruda/classes/pageargs/authverification.dart';
+import 'package:acruda/pages/auth/login.dart';
+import 'package:acruda/pages/auth/verification.dart';
+import 'package:acruda/services/auth.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -19,7 +19,7 @@ class RegisterPage extends StatelessWidget {
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
-          child: Expanded(
+          child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -27,7 +27,7 @@ class RegisterPage extends StatelessWidget {
                   child: Text("Create Account"),
                 ),
                 const SizedBox(height: 50),
-                RegisterForm()
+                RegisterForm(),
               ],
             ),
           ),
@@ -41,6 +41,7 @@ class RegisterForm extends HookWidget {
   RegisterForm({super.key});
 
   final _formKey = GlobalKey<FormBuilderState>();
+
   @override
   Widget build(BuildContext context) {
     final isLoading = useState(false);
@@ -58,7 +59,6 @@ class RegisterForm extends HookWidget {
           ),
           const SizedBox(height: 10),
           FormBuilderTextField(
-            // key: _emailFieldKey,
             name: 'email',
             decoration: const InputDecoration(labelText: 'Email'),
             validator: FormBuilderValidators.compose([
@@ -81,9 +81,6 @@ class RegisterForm extends HookWidget {
             padding: const EdgeInsets.symmetric(vertical: 7.5),
             color: Colors.black,
             onPressed: () async {
-              // _formKey.currentState?.saveAndValidate();
-              // debugPrint(_formKey.currentState?.value.toString());
-
               if (_formKey.currentState?.saveAndValidate() ?? false) {
                 final formData = _formKey.currentState?.value;
                 if (formData != null) {

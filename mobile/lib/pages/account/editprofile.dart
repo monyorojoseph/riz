@@ -3,8 +3,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/classes/user.dart';
-import 'package:mobile/services/user.dart';
+import 'package:acruda/classes/user.dart';
+import 'package:acruda/services/user.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

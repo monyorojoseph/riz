@@ -1,4 +1,4 @@
-import 'package:mobile/classes/user.dart';
+import 'package:acruda/classes/user.dart';
 
 class VehicleBrand {
   final num id;

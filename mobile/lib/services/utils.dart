@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:mobile/utils/storage.dart';
+import 'package:acruda/utils/storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 
 class AppService {
   final MyCustomSecureStorage storage = MyCustomSecureStorage();
@@ -61,17 +61,17 @@ class AppService {
   }
 
   // Upload images
-  Future<StreamedResponse> uploadImages(String url, List<XFile> files) async {
-    String? access = await storage.read(key: "accessToken");
+  // Future<StreamedResponse> uploadImages(String url, List<XFile> files) async {
+  //   String? access = await storage.read(key: "accessToken");
 
-    var request = http.MultipartRequest('POST', Uri.parse(url));
-    request.headers['Authorization'] = "Bearer $access";
-    for (var file in files) {
-      request.files.add(await http.MultipartFile.fromPath('files', file.path));
-    }
-    var response = await request.send();
-    return response;
-  }
+  //   var request = http.MultipartRequest('POST', Uri.parse(url));
+  //   request.headers['Authorization'] = "Bearer $access";
+  //   for (var file in files) {
+  //     request.files.add(await http.MultipartFile.fromPath('files', file.path));
+  //   }
+  //   var response = await request.send();
+  //   return response;
+  // }
 }
 
 final appService = AppService();

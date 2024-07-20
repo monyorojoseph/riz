@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/classes/vehiclerentalpolicy.dart';
-import 'package:mobile/services/url.dart';
-import 'package:mobile/services/utils.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:acruda/classes/vehicle.dart';
+import 'package:acruda/classes/vehiclerentalpolicy.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/utils.dart';
+// import 'package:image_picker/image_picker.dart';
 
 // vehicle brand
 Future<List<VehicleBrand>> getVehicleBrands() async {
@@ -120,7 +119,8 @@ Future<Vehicle> updateVehicle(
     throw Exception('Failed to update vehicle details.');
   }
 }
-// deleted listed vehicle
+
+// delete listed vehicle
 
 // overview verfication
 Future<List<VehicleVerificationOverview>> vehicleVerificationOverview(

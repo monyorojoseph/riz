@@ -215,6 +215,13 @@ class VehicleAPI:
         vehicle.save()
         return vehicle 
     
+    # delete
+    @route.delete("{str:id}/delete", auth=JWTAuth())
+    def delete(self, request, id):
+        vehicle = Vehicle.objects.get(id=id)
+        vehicle.delete()
+        return 200
+    
     # enable display
     @route.get("{str:id}/enable-display", response={200: VehicleSchema, codes_4xx: Error }, auth=JWTAuth())
     def enable_display(self, request, id):

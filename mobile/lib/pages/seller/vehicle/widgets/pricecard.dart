@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/classes/pricing.dart';
-import 'package:mobile/constants/pricing.dart';
-import 'package:mobile/services/url.dart';
-import 'package:mobile/services/utils.dart';
+import 'package:acruda/classes/pricing.dart';
+import 'package:acruda/constants/pricing.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/utils.dart';
 
 class PriceCard extends HookWidget {
   final Pricing price;

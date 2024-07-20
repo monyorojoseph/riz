@@ -1,6 +1,6 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UserVerificationPage extends HookWidget {
   const UserVerificationPage({super.key});
@@ -14,10 +14,10 @@ class UserVerificationPage extends HookWidget {
       ),
       body: Container(
         padding: const EdgeInsets.all(16.0),
-        child: const Column(
+        child: Column(
           children: <Widget>[
             IdentityVerification(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             DrivingLicenseVerification(),
           ],
         ),
@@ -27,7 +27,8 @@ class UserVerificationPage extends HookWidget {
 }
 
 class IdentityVerification extends HookWidget {
-  const IdentityVerification({super.key});
+  IdentityVerification({super.key});
+  final ImagePicker picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,9 @@ class IdentityVerification extends HookWidget {
         const SizedBox(height: 5),
         GestureDetector(
           onTap: () async {
-            FilePickerResult? result = await FilePicker.platform.pickFiles();
+            // Pick an image.
+            final XFile? image =
+                await picker.pickImage(source: ImageSource.gallery);
           },
           child: const Text(
             'Upload Document',
@@ -70,7 +73,8 @@ class IdentityVerification extends HookWidget {
 }
 
 class DrivingLicenseVerification extends HookWidget {
-  const DrivingLicenseVerification({super.key});
+  DrivingLicenseVerification({super.key});
+  final ImagePicker picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +101,9 @@ class DrivingLicenseVerification extends HookWidget {
         const SizedBox(height: 5),
         GestureDetector(
           onTap: () async {
-            FilePickerResult? result = await FilePicker.platform.pickFiles();
+            // Pick an image.
+            final XFile? image =
+                await picker.pickImage(source: ImageSource.gallery);
           },
           child: const Text(
             'Upload Document',

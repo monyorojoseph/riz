@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:mobile/classes/auth.dart';
-import 'package:mobile/classes/pageargs/authverification.dart';
-import 'package:mobile/pages/loaders/mainpage.dart';
-import 'package:mobile/services/auth.dart';
-import 'package:mobile/utils/storage.dart';
+import 'package:acruda/classes/auth.dart';
+import 'package:acruda/classes/pageargs/authverification.dart';
+import 'package:acruda/pages/loaders/mainpage.dart';
+import 'package:acruda/services/auth.dart';
+import 'package:acruda/utils/storage.dart';
 
 class AuthVerificationPage extends StatelessWidget {
   const AuthVerificationPage({super.key});

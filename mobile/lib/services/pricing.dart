@@ -1,9 +1,9 @@
 // create vehicle pricing
 import 'dart:convert';
 
-import 'package:mobile/classes/pricing.dart';
-import 'package:mobile/services/url.dart';
-import 'package:mobile/services/utils.dart';
+import 'package:acruda/classes/pricing.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/utils.dart';
 
 Future<Pricing> createVehiclePricing(Map<String, dynamic> data) async {
   final response = await appService.genericPost(

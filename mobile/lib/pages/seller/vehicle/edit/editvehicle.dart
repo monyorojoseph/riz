@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/classes/pageargs/editvehicle.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehiclebasic.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicledetails.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicleimages.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicleoverview.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehiclerates.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehiclerules.dart';
-import 'package:mobile/pages/seller/vehicle/edit/widgets/editvehicleverification.dart';
-import 'package:mobile/services/vehicle.dart';
+import 'package:acruda/classes/pageargs/editvehicle.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehiclebasic.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehicledetails.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehicleimages.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehicleoverview.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehiclerates.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehiclerules.dart';
+import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehicleverification.dart';
+import 'package:acruda/services/vehicle.dart';
 
 enum EditSteps {
   overview,
@@ -86,8 +86,9 @@ class EditVehiclePage extends HookWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(25, 5, 25, 15),
+          margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
           child: selectedPage,
         ),
       ),

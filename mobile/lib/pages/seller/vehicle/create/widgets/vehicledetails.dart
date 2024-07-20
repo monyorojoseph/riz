@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/constants/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create/create.dart';
-import 'package:mobile/services/vehicle.dart';
+import 'package:acruda/classes/vehicle.dart';
+import 'package:acruda/constants/vehicle.dart';
+import 'package:acruda/pages/seller/vehicle/create/create.dart';
+import 'package:acruda/services/vehicle.dart';
 
 class CreateVehicleDetails extends HookWidget {
   final ValueNotifier<CreateSteps> currentPage;

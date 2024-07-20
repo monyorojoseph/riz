@@ -1,14 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/classes/pageargs/editvehicle.dart';
-import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create/create.dart';
-import 'package:mobile/pages/seller/vehicle/edit/editvehicle.dart';
-import 'package:mobile/services/user.dart';
-import 'package:mobile/services/vehicle.dart';
-import 'package:mobile/widgets/bottomnavbar/sellerbottomnavbar.dart';
+import 'package:acruda/classes/pageargs/editvehicle.dart';
+import 'package:acruda/classes/utils.dart';
+import 'package:acruda/classes/vehicle.dart';
+import 'package:acruda/pages/seller/vehicle/create/create.dart';
+import 'package:acruda/pages/seller/vehicle/edit/editvehicle.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/user.dart';
+import 'package:acruda/services/utils.dart';
+import 'package:acruda/services/vehicle.dart';
+import 'package:acruda/widgets/bottomnavbar/sellerbottomnavbar.dart';
 
 class SellerHomePage extends HookWidget {
   const SellerHomePage({super.key});
@@ -22,6 +27,11 @@ class SellerHomePage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        centerTitle: false,
+        title: Text(
+          "Welcome back, $fullName",
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
       ),
       bottomNavigationBar: const BottomAppBar(
           child: SellerBottomNavbarItems(
@@ -45,11 +55,7 @@ class SellerHomePage extends HookWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-        children: <Widget>[
-          Text("Welcome back, $fullName"),
-          const SizedBox(height: 20),
-          const MyListings(),
-        ],
+        children: const <Widget>[MyListings()],
       ),
     );
   }
@@ -65,8 +71,8 @@ class MyListings extends HookWidget {
         Row(
           children: [
             Text(
-              "My Listings",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+              "Your Listings",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             )
           ],
         ),
@@ -108,36 +114,115 @@ class VehicleListings extends HookWidget {
   }
 }
 
-class VehicleListing extends StatefulWidget {
+class VehicleListing extends HookWidget {
   final Vehicle vehicle;
   const VehicleListing({super.key, required this.vehicle});
-  @override
-  State<VehicleListing> createState() => _VehicleListingState();
-}
-
-class _VehicleListingState extends State<VehicleListing>
-    with SingleTickerProviderStateMixin {
-  late final controller = SlidableController(this);
 
   @override
   Widget build(BuildContext context) {
+    final queryClient = useQueryClient();
+    final controller = useAnimationController();
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 7.5),
       child: Slidable(
-        key: ValueKey(widget.vehicle.id),
+        key: ValueKey(vehicle.id),
         endActionPane: ActionPane(
           motion: const ScrollMotion(),
-          dismissible: DismissiblePane(onDismissed: () {}),
           children: <Widget>[
             SlidableAction(
-              onPressed: (BuildContext context) {},
+              onPressed: (BuildContext context) async {
+                final response = await appService.genericGet(
+                    true, '$baseUrl/vehicle/${vehicle.id}/enable-display');
+                if (response.statusCode == 200) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Your vehicle is visible to the public'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } else {
+                  if (context.mounted) {
+                    final msg = ErrorMessage.fromJson(
+                        jsonDecode(response.body) as Map<String, dynamic>);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Update failed: ${msg.detail} to enable display.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               icon: Icons.remove_red_eye,
               label: "Display",
             ),
             SlidableAction(
-              onPressed: (BuildContext context) {},
+              onPressed: (BuildContext context) {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                                "Are you sure you want to remove ${vehicle.brand.name} ${vehicle.model.name}"),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                ElevatedButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("No")),
+                                const SizedBox(width: 5),
+                                ElevatedButton(
+                                    onPressed: () async {
+                                      final response =
+                                          await appService.genericDelete(
+                                              '$baseUrl/vehicle/${vehicle.id}/delete');
+                                      if (response.statusCode == 200) {
+                                        queryClient
+                                            .invalidateQueries(['myListings']);
+
+                                        if (context.mounted) {
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Vehicle has been removed.'),
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'Failed to remove Vehicle.'),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    child: const Text("Yes")),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               icon: Icons.delete,
@@ -148,12 +233,12 @@ class _VehicleListingState extends State<VehicleListing>
         child: GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, EditVehiclePage.routeName,
-                arguments: EditVehiclePageArgs(widget.vehicle.id));
+                arguments: EditVehiclePageArgs(vehicle.id));
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
-              color: widget.vehicle.display
+              color: vehicle.display
                   ? Colors.white
                   : Colors.black.withOpacity(0.05),
               borderRadius: const BorderRadius.all(Radius.circular(3)),
@@ -170,7 +255,7 @@ class _VehicleListingState extends State<VehicleListing>
                 Row(
                   children: <Widget>[
                     Text(
-                      '${widget.vehicle.brand.name}  ${widget.vehicle.model.name}',
+                      '${vehicle.brand.name}  ${vehicle.model.name}',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     )
@@ -180,7 +265,7 @@ class _VehicleListingState extends State<VehicleListing>
                 Row(
                   children: <Widget>[
                     Text(
-                      widget.vehicle.yom.toString(),
+                      vehicle.yom.toString(),
                       style: const TextStyle(fontWeight: FontWeight.w400),
                     )
                   ],

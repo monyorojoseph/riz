@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/bottomnavbar/clientbottomnavbaritems.dart';
+import 'package:acruda/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
@@ -31,9 +31,10 @@ class NotificationsPage extends StatelessWidget {
           ),
         ]),
         bottomNavigationBar: const BottomAppBar(
-            child: ClientBottomNavbarItems(
-          currentTab: routeName,
-        )),
+          child: ClientBottomNavbarItems(
+            currentTab: routeName,
+          ),
+        ),
       ),
     );
   }

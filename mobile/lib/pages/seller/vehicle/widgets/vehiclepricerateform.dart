@@ -3,11 +3,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/classes/pricing.dart';
-import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/constants/pricing.dart';
-import 'package:mobile/pages/seller/vehicle/widgets/pricecard.dart';
-import 'package:mobile/services/pricing.dart';
+import 'package:acruda/classes/pricing.dart';
+import 'package:acruda/classes/vehicle.dart';
+import 'package:acruda/constants/pricing.dart';
+import 'package:acruda/pages/seller/vehicle/widgets/pricecard.dart';
+import 'package:acruda/services/pricing.dart';
 
 class VehiclePriceRatesForm extends HookWidget {
   final Vehicle vehicle;

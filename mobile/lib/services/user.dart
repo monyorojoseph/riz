@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:mobile/classes/user.dart';
-import 'package:mobile/services/url.dart';
-import 'package:mobile/services/utils.dart';
+import 'package:flutter/foundation.dart';
+import 'package:acruda/classes/user.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/utils.dart';
 
 // user ( slim )
 Future<SlimUser> getSlimUser() async {

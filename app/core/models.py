@@ -194,7 +194,8 @@ class Vehicle(LifecycleModelMixin, models.Model):
     
     @hook(AFTER_DELETE)
     def remove_related_content(self):
-        self.contentObject.delete()
+        if self.contentObject:
+            self.contentObject.delete()
 
 class VehicleImage(models.Model):
     vehicle = models.ForeignKey('Vehicle', related_name='images', on_delete=models.CASCADE)

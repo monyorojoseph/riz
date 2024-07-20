@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:mobile/classes/pageargs/editvehicle.dart';
-import 'package:mobile/classes/vehicle.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclebasic.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehicledetails.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleimages.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleintro.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclerates.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclerules.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehiclesubmit.dart';
-import 'package:mobile/pages/seller/vehicle/create/widgets/vehicleverification.dart';
+import 'package:acruda/classes/pageargs/editvehicle.dart';
+import 'package:acruda/classes/vehicle.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehiclebasic.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehicledetails.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehicleimages.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehicleintro.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehiclerates.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehiclerules.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehiclesubmit.dart';
+import 'package:acruda/pages/seller/vehicle/create/widgets/vehicleverification.dart';
 
 enum CreateSteps {
   intro,
@@ -75,8 +75,9 @@ class CreateVehiclePage extends HookWidget {
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(25, 5, 25, 15),
+          margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
           child: selectedPage,
         ),
       ),

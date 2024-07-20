@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart';
-import 'package:mobile/classes/auth.dart';
-import 'package:mobile/services/url.dart';
-import 'package:mobile/services/utils.dart';
+import 'package:acruda/classes/auth.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/utils.dart';
 
 // login
 Future<LoginUser> loginUser(String email, String password) async {

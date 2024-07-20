@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:mobile/classes/vehicle.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:acruda/classes/vehicle.dart';
+import 'package:image_picker/image_picker.dart';
 
 class VehicleVerficationForm extends HookWidget {
   final Vehicle vehicle;
@@ -10,15 +10,15 @@ class VehicleVerficationForm extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: <Widget>[
-        Text(
+        const Text(
           "Vehicle Verification",
           style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 50),
+        const SizedBox(height: 50),
         ProveOfOwnershipDocs(),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         VehicleInspectionDocs(),
       ],
     );
@@ -26,7 +26,8 @@ class VehicleVerficationForm extends HookWidget {
 }
 
 class ProveOfOwnershipDocs extends HookWidget {
-  const ProveOfOwnershipDocs({super.key});
+  ProveOfOwnershipDocs({super.key});
+  final ImagePicker picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,9 @@ class ProveOfOwnershipDocs extends HookWidget {
         const SizedBox(height: 5),
         GestureDetector(
           onTap: () async {
-            FilePickerResult? result = await FilePicker.platform.pickFiles();
+            // Pick an image.
+            final XFile? image =
+                await picker.pickImage(source: ImageSource.gallery);
           },
           child: const Text(
             'Upload',
@@ -67,7 +70,8 @@ class ProveOfOwnershipDocs extends HookWidget {
 }
 
 class VehicleInspectionDocs extends HookWidget {
-  const VehicleInspectionDocs({super.key});
+  VehicleInspectionDocs({super.key});
+  final ImagePicker picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +97,9 @@ class VehicleInspectionDocs extends HookWidget {
         const SizedBox(height: 5),
         GestureDetector(
           onTap: () async {
-            FilePickerResult? result = await FilePicker.platform.pickFiles();
+            // Pick an image.
+            final XFile? image =
+                await picker.pickImage(source: ImageSource.gallery);
           },
           child: const Text(
             'Upload',

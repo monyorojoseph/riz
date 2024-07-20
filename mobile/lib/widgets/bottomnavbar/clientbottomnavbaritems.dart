@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/pages/account/account.dart';
-import 'package:mobile/pages/history/history.dart';
-import 'package:mobile/pages/home/home.dart';
-import 'package:mobile/pages/loaders/switchpage.dart';
-import 'package:mobile/pages/notifications/notifications.dart';
-import 'package:mobile/services/user.dart';
+import 'package:acruda/pages/account/account.dart';
+import 'package:acruda/pages/history/history.dart';
+import 'package:acruda/pages/home/home.dart';
+import 'package:acruda/pages/loaders/switchpage.dart';
+import 'package:acruda/pages/notifications/notifications.dart';
+import 'package:acruda/services/user.dart';
 
 class ClientBottomNavbarItems extends HookWidget {
   const ClientBottomNavbarItems({super.key, required this.currentTab});

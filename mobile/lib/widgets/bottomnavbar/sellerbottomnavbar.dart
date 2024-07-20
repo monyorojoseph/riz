@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/pages/account/account.dart';
-import 'package:mobile/pages/history/history.dart';
-import 'package:mobile/pages/home/home.dart';
-import 'package:mobile/pages/loaders/switchpage.dart';
-import 'package:mobile/pages/notifications/notifications.dart';
-import 'package:mobile/pages/seller/calendar.dart';
-import 'package:mobile/pages/seller/home.dart';
-import 'package:mobile/pages/seller/menu.dart';
-import 'package:mobile/pages/seller/notifications.dart';
-import 'package:mobile/services/user.dart';
+import 'package:acruda/pages/account/account.dart';
+import 'package:acruda/pages/history/history.dart';
+import 'package:acruda/pages/home/home.dart';
+import 'package:acruda/pages/loaders/switchpage.dart';
+import 'package:acruda/pages/notifications/notifications.dart';
+import 'package:acruda/pages/seller/calendar.dart';
+import 'package:acruda/pages/seller/home.dart';
+import 'package:acruda/pages/seller/menu.dart';
+import 'package:acruda/pages/seller/notifications.dart';
+import 'package:acruda/services/user.dart';
 
 class SellerBottomNavbarItems extends HookWidget {
   const SellerBottomNavbarItems({super.key, required this.currentTab});

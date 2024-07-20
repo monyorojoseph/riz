@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:mobile/pages/home/home.dart';
-import 'package:mobile/pages/seller/home.dart';
-import 'package:mobile/services/user.dart';
+import 'package:acruda/pages/home/home.dart';
+import 'package:acruda/pages/seller/home.dart';
+import 'package:acruda/services/user.dart';
 
 class MainLoaderPage extends HookWidget {
   const MainLoaderPage({super.key});
@@ -12,6 +12,10 @@ class MainLoaderPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final usersetting = useQuery(['userSettingDetails'], getUserSettingDetails);
+
+    // if (usersetting.isError) {
+    //   debugPrint(usersetting.error.toString());
+    // }
 
     // Use useEffect to perform side-effects (like navigation) when usersetting changes
     useEffect(() {
@@ -22,6 +26,7 @@ class MainLoaderPage extends HookWidget {
       }
       return null;
     }, [usersetting]);
+
     return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
