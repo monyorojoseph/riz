@@ -1,5 +1,6 @@
+import 'package:acruda/classes/pageargs/authverification.dart';
+import 'package:acruda/classes/pageargs/editvehicle.dart';
 import 'package:acruda/pages/landing/landingpage.dart';
-import 'package:acruda/services/user.dart';
 import 'package:acruda/utils/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,8 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: AuthVerificationPage.routeName,
         builder: (BuildContext context, GoRouterState state) {
-          return const AuthVerificationPage();
+          final args = state.extra as AuthVerificationPageArgs;
+          return AuthVerificationPage(args: args);
         },
       ),
 
@@ -200,20 +202,23 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: SwitchLoaderPage.routeName,
         builder: (BuildContext context, GoRouterState state) {
-          return const SwitchLoaderPage();
+          final args = state.extra as SwitchLoaderPageArgs;
+          return SwitchLoaderPage(args: args);
         },
       ),
 
       GoRoute(
         path: CreateVehiclePage.routeName,
         builder: (BuildContext context, GoRouterState state) {
-          return const CreateVehiclePage();
+          final args = state.extra as CreateVehiclePageArgs?;
+          return CreateVehiclePage(args: args);
         },
       ),
       GoRoute(
         path: EditVehiclePage.routeName,
         builder: (BuildContext context, GoRouterState state) {
-          return const EditVehiclePage();
+          final args = state.extra as EditVehiclePageArgs;
+          return EditVehiclePage(args: args);
         },
       ),
     ],

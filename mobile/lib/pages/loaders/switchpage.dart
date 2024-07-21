@@ -7,21 +7,18 @@ import 'package:acruda/pages/seller/home.dart';
 import 'package:acruda/services/user.dart';
 
 class SwitchLoaderPage extends HookWidget {
-  const SwitchLoaderPage({super.key});
+  final SwitchLoaderPageArgs args;
+  const SwitchLoaderPage({super.key, required this.args});
   static const routeName = '/pageSwicher';
 
   @override
   Widget build(BuildContext context) {
     final queryClient = useQueryClient();
 
-    final args =
-        ModalRoute.of(context)!.settings.arguments as SwitchLoaderPageArgs;
-    String currentScreen = args.currentScreen;
-
     useEffect(() {
       void updateUserSettingOnLoad() async {
         final usersetting = await updateUserSettingDetails(
-            UpdateUserSetting(currentScreen: currentScreen));
+            UpdateUserSetting(currentScreen: args.currentScreen));
 
         queryClient.setQueryData<UserSetting>(
             ['userSettingDetails'], (previous) => usersetting);

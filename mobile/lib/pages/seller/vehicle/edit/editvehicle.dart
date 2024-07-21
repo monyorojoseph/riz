@@ -23,13 +23,12 @@ enum EditSteps {
 }
 
 class EditVehiclePage extends HookWidget {
-  const EditVehiclePage({super.key});
+  final EditVehiclePageArgs args;
+  const EditVehiclePage({super.key, required this.args});
   static const routeName = '/editevehicle';
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as EditVehiclePageArgs;
     final vehicle =
         useQuery(['${args.id}-vehicle'], () => listedVehicleDetails(args.id));
     final currentPage = useState<EditSteps>(EditSteps.overview);

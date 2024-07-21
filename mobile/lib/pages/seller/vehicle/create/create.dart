@@ -23,15 +23,14 @@ enum CreateSteps {
 }
 
 class CreateVehiclePage extends HookWidget {
-  const CreateVehiclePage({super.key});
+  final CreateVehiclePageArgs? args;
+  const CreateVehiclePage({super.key, this.args});
   static const routeName = '/createvehicle';
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as CreateVehiclePageArgs;
-    final currentPage = useState<CreateSteps>(args.page ?? CreateSteps.intro);
-    final vehicle = useState<Vehicle?>(args.vehicle);
+    final currentPage = useState<CreateSteps>(args?.page ?? CreateSteps.intro);
+    final vehicle = useState<Vehicle?>(args?.vehicle);
     final landVehicle = useState<LandVehicle?>(null);
 
     Widget selectedPage = useMemoized(() {
@@ -73,7 +72,9 @@ class CreateVehiclePage extends HookWidget {
       }
     }, [currentPage.value]);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+      ),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.fromLTRB(25, 5, 25, 15),

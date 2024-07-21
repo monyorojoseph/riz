@@ -13,7 +13,7 @@ import 'package:acruda/services/url.dart';
 import 'package:acruda/services/user.dart';
 import 'package:acruda/services/utils.dart';
 import 'package:acruda/services/vehicle.dart';
-import 'package:acruda/widgets/bottomnavbar/sellerbottomnavbar.dart';
+import 'package:go_router/go_router.dart';
 
 class SellerHomePage extends HookWidget {
   const SellerHomePage({super.key});
@@ -35,8 +35,8 @@ class SellerHomePage extends HookWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, CreateVehiclePage.routeName,
-              arguments: CreateVehiclePageArgs());
+          GoRouter.of(context)
+              .go(CreateVehiclePage.routeName, extra: CreateVehiclePageArgs());
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),

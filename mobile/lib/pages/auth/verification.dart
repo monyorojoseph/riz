@@ -1,5 +1,4 @@
 import 'package:acruda/pages/home/home.dart';
-import 'package:acruda/pages/notifications/notifications.dart';
 import 'package:acruda/pages/seller/home.dart';
 import 'package:acruda/services/user.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +12,12 @@ import 'package:acruda/utils/storage.dart';
 import 'package:go_router/go_router.dart';
 
 class AuthVerificationPage extends StatelessWidget {
-  const AuthVerificationPage({super.key});
+  final AuthVerificationPageArgs args;
+  const AuthVerificationPage({super.key, required this.args});
   static const routeName = '/authVerification';
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as AuthVerificationPageArgs;
-
     return Scaffold(
       body: Container(
         color: Colors.white,
