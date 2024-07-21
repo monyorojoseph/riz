@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:acruda/classes/vehicle.dart';
-// import 'package:acruda/pages/seller/vehicle/widgets/vehicleimagesform.dart';
+import 'package:acruda/pages/seller/vehicle/widgets/vehicleimagesform.dart';
 import 'package:acruda/services/url.dart';
 import 'package:acruda/services/vehicle.dart';
 
@@ -56,7 +56,7 @@ class EditVehicleImages extends HookWidget {
           ),
         ),
         const SizedBox(height: 30),
-        // VehicleImagesForm(vehicle: vehicle),
+        VehicleImagesForm(vehicle: vehicle),
       ],
     );
   }

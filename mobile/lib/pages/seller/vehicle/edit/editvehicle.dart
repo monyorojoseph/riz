@@ -1,3 +1,4 @@
+import 'package:acruda/pages/seller/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
@@ -10,6 +11,7 @@ import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehiclerates.dart';
 import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehiclerules.dart';
 import 'package:acruda/pages/seller/vehicle/edit/widgets/editvehicleverification.dart';
 import 'package:acruda/services/vehicle.dart';
+import 'package:go_router/go_router.dart';
 
 enum EditSteps {
   overview,
@@ -29,7 +31,6 @@ class EditVehiclePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(args.toString());
     final vehicle =
         useQuery(['${args.id}-vehicle'], () => listedVehicleDetails(args.id));
     final currentPage = useState<EditSteps>(EditSteps.overview);
@@ -44,7 +45,17 @@ class EditVehiclePage extends HookWidget {
         ),
       );
     }
-    debugPrint(vehicle.data?.id.toString());
+
+    if (vehicle.isError) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Edit Vehicle"),
+        ),
+        body: const Center(
+          child: Text("Failed to fetch vehicle details"),
+        ),
+      );
+    }
     Widget selectedPage = useMemoized(() {
       switch (currentPage.value) {
         case EditSteps.basic:
@@ -78,7 +89,7 @@ class EditVehiclePage extends HookWidget {
           ),
           onTap: () {
             if (currentPage.value == EditSteps.overview) {
-              Navigator.pop(context);
+              context.go(SellerHomePage.routeName);
             } else {
               currentPage.value = EditSteps.overview;
             }

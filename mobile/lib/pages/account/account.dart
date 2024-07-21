@@ -1,6 +1,10 @@
 // import 'package:file_picker/file_picker.dart';
+import 'package:acruda/services/url.dart';
+import 'package:acruda/services/utils.dart';
+import 'package:acruda/utils/utils.dart';
 import 'package:acruda/widgets/switc/switchcurrentscreen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,6 +15,7 @@ import 'package:acruda/pages/account/usersettings.dart';
 import 'package:acruda/pages/account/verification.dart';
 import 'package:acruda/services/user.dart';
 import 'package:acruda/widgets/auth/logout.dart';
+import 'package:intl/intl.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -23,6 +28,7 @@ class AccountPage extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           color: Colors.white,
           child: ListView(
             children: <Widget>[
@@ -127,61 +133,73 @@ class UserDetails extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = useQuery(['userDetails'], getUserDetails);
-    return Center(
-      child: Row(
-        children: <Widget>[
-          Stack(
-            children: <Widget>[
-              const CircleAvatar(
-                maxRadius: 35,
-                backgroundImage: AssetImage('assets/defaults/user.jpg'),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () async {
-                    // FilePickerResult? result =
-                    //     await FilePicker.platform.pickFiles();
+    final queryClient = useQueryClient();
 
-                    // Pick an image.
-                    final XFile? image =
-                        await picker.pickImage(source: ImageSource.gallery);
-                  },
-                  child: const Icon(
-                    Icons.image,
-                    size: 30,
-                    color: Colors.black54,
-                  ),
+    final user = useQuery(['userDetails'], getUserDetails);
+
+    final userImage = user.data?.profilePicture != null
+        ? NetworkImage('$baseUrl${user.data?.profilePicture}')
+        : const AssetImage('assets/defaults/user.jpg');
+
+    Future<void> pickAndUploadImage() async {
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        String url = '$baseUrl/user/upload-pp';
+        StreamedResponse streamResponse =
+            await appService.uploadImage(url, image);
+        if (streamResponse.statusCode == 200) {
+          queryClient.invalidateQueries(['userDetails']);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to upload profile picture')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Picture is needed')),
+        );
+      }
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Stack(
+          children: <Widget>[
+            CircleAvatar(
+              maxRadius: 35,
+              backgroundImage: userImage as ImageProvider,
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: pickAndUploadImage,
+                child: const Icon(
+                  Icons.image,
+                  size: 30,
+                  color: Colors.black54,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(width: 30),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(Icons.verified_outlined),
-                  const SizedBox(width: 5),
-                  Text(
-                    user.data?.fullName ?? "",
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              Text(
-                "Joined ${user.data?.joinedOn.day}",
-                style: const TextStyle(fontSize: 12),
-              ),
-            ],
-          )
-        ],
-      ),
+            ),
+          ],
+        ),
+        const SizedBox(width: 30),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              user.data?.fullName ?? "",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Joined ${user.data?.joinedOn != null ? formatDate(user.data!.joinedOn.toLocal()) : ""}",
+              style: const TextStyle(fontSize: 13),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

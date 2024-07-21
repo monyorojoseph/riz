@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:acruda/classes/vehicle.dart';
 import 'package:acruda/pages/seller/vehicle/create/create.dart';
-// import 'package:acruda/pages/seller/vehicle/widgets/vehicleimagesform.dart';
-
-// typedef Progress = Function(double percent);
+import 'package:acruda/pages/seller/vehicle/widgets/vehicleimagesform.dart';
 
 class CreateVehicleImages extends HookWidget {
   final ValueNotifier<CreateSteps> currentPage;
@@ -17,7 +15,7 @@ class CreateVehicleImages extends HookWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        // VehicleImagesForm(vehicle: vehicle.value!),
+        VehicleImagesForm(vehicle: vehicle.value!),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
