@@ -1,3 +1,6 @@
+import 'package:acruda/pages/landing/landingpage.dart';
+import 'package:acruda/services/user.dart';
+import 'package:acruda/utils/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +16,6 @@ import 'package:acruda/pages/auth/login.dart';
 import 'package:acruda/pages/auth/register.dart';
 import 'package:acruda/pages/auth/verification.dart';
 import 'package:acruda/pages/home/home.dart';
-import 'package:acruda/pages/loaders/mainpage.dart';
 import 'package:acruda/pages/loaders/switchpage.dart';
 import 'package:acruda/pages/notifications/notifications.dart';
 import 'package:acruda/pages/seller/calendar.dart';
@@ -22,10 +24,15 @@ import 'package:acruda/pages/seller/menu.dart';
 import 'package:acruda/pages/seller/notifications.dart';
 import 'package:acruda/pages/seller/vehicle/create/create.dart';
 import 'package:acruda/pages/seller/vehicle/edit/editvehicle.dart';
-import 'package:acruda/utils/storage.dart';
+import 'package:go_router/go_router.dart';
 
 import 'pages/account/account.dart';
 import 'pages/history/history.dart';
+
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final queryClient = QueryClient(
   defaultQueryOptions: DefaultQueryOptions(),
@@ -38,14 +45,184 @@ void main() {
   runApp(QueryClientProvider(queryClient: queryClient, child: MyApp()));
 }
 
+final _storage = MyCustomSecureStorage();
+
+Future<Map<String, String>> _readStorageValues() async {
+  try {
+    return await _storage.readAll();
+  } catch (error) {
+    return {}; // Return an empty map on error
+  }
+}
+
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-  final _storage = MyCustomSecureStorage();
+
+  final GoRouter _router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: Landingpage.routeName,
+    debugLogDiagnostics: true,
+    redirect: (BuildContext context, GoRouterState state) async {
+      final storageValues = await _readStorageValues();
+
+      if (storageValues.containsKey('accessToken') &&
+          storageValues.containsKey('refreshToken')) {
+        return state.uri.path;
+      } else {
+        return Landingpage.routeName;
+      }
+    },
+    routes: <RouteBase>[
+      GoRoute(
+        path: Landingpage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const Landingpage();
+        },
+      ),
+
+      GoRoute(
+        path: LoginPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const LoginPage();
+        },
+      ),
+
+      GoRoute(
+        path: RegisterPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const RegisterPage();
+        },
+      ),
+
+      GoRoute(
+        path: AuthVerificationPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AuthVerificationPage();
+        },
+      ),
+
+      /// Client Application shell
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (BuildContext context, GoRouterState state, Widget child) {
+          return ScaffoldClientNavBar(child: child);
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: HomePage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const HomePage();
+            },
+          ),
+          GoRoute(
+            path: HistoryPage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const HistoryPage();
+            },
+          ),
+          GoRoute(
+            path: NotificationsPage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const NotificationsPage();
+            },
+          ),
+          GoRoute(
+            path: AccountPage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const AccountPage();
+            },
+          ),
+        ],
+      ),
+
+      // Seller Application shell
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (BuildContext context, GoRouterState state, Widget child) {
+          return ScaffoldSellerNavBar(child: child);
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: SellerHomePage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const SellerHomePage();
+            },
+          ),
+          GoRoute(
+            path: SellerCalendarPage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const SellerCalendarPage();
+            },
+          ),
+          GoRoute(
+            path: SellerNotificationPage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const SellerNotificationPage();
+            },
+          ),
+          GoRoute(
+            path: SellerMenuPage.routeName,
+            builder: (BuildContext context, GoRouterState state) {
+              return const SellerMenuPage();
+            },
+          ),
+        ],
+      ),
+
+      // /// other routes
+      GoRoute(
+        path: ProfilePage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const ProfilePage();
+        },
+      ),
+
+      GoRoute(
+        path: UserVerificationPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const UserVerificationPage();
+        },
+      ),
+
+      GoRoute(
+        path: UserSettingsPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const UserSettingsPage();
+        },
+      ),
+
+      GoRoute(
+        path: UserListVehiclePage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const UserListVehiclePage();
+        },
+      ),
+      GoRoute(
+        path: SwitchLoaderPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const SwitchLoaderPage();
+        },
+      ),
+
+      GoRoute(
+        path: CreateVehiclePage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const CreateVehiclePage();
+        },
+      ),
+      GoRoute(
+        path: EditVehiclePage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const EditVehiclePage();
+        },
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Riz',
+    return MaterialApp.router(
+      title: 'Acruda',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         FormBuilderLocalizations.delegate,
@@ -59,9 +236,9 @@ class MyApp extends StatelessWidget {
       ],
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            // foregroundColor: Colors.white,
-            surfaceTintColor: Colors.white),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+        ),
         bottomAppBarTheme: const BottomAppBarTheme(
             surfaceTintColor: Colors.white,
             shadowColor: Colors.black54,
@@ -76,7 +253,7 @@ class MyApp extends StatelessWidget {
           floatingLabelStyle: TextStyle(color: Colors.black),
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-              color: Colors.black, // border color when focused
+              color: Colors.black,
               width: 2.0,
             ),
           ),
@@ -89,74 +266,144 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
-      // initialRoute: HomePage.routeName,
-      onGenerateInitialRoutes: _onGenerateInitialRoutes,
-      routes: {
-        HomePage.routeName: (context) => const HomePage(),
-        LoginPage.routeName: (context) => const LoginPage(),
-        RegisterPage.routeName: (context) => const RegisterPage(),
-        AuthVerificationPage.routeName: (context) =>
-            const AuthVerificationPage(),
-        AccountPage.routeName: (context) => const AccountPage(),
-        HistoryPage.routeName: (context) => const HistoryPage(),
-        NotificationsPage.routeName: (context) => const NotificationsPage(),
-        ProfilePage.routeName: (context) => const ProfilePage(),
-        UserVerificationPage.routeName: (context) =>
-            const UserVerificationPage(),
-        UserSettingsPage.routeName: (context) => const UserSettingsPage(),
-        UserListVehiclePage.routeName: (context) => const UserListVehiclePage(),
-        // loaders
-        MainLoaderPage.routeName: (context) => const MainLoaderPage(),
-        SwitchLoaderPage.routeName: (context) => const SwitchLoaderPage(),
-        // seller pages
-        SellerHomePage.routeName: (context) => const SellerHomePage(),
-        SellerCalendarPage.routeName: (context) => const SellerCalendarPage(),
-        SellerMenuPage.routeName: (context) => const SellerMenuPage(),
-        SellerNotificationPage.routeName: (context) =>
-            const SellerNotificationPage(),
-        CreateVehiclePage.routeName: (context) => const CreateVehiclePage(),
-        EditVehiclePage.routeName: (context) => const EditVehiclePage()
-      },
+      routerConfig: _router,
+    );
+  }
+}
+
+class ScaffoldClientNavBar extends StatelessWidget {
+  const ScaffoldClientNavBar({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: child,
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_outlined),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle_outlined),
+            label: 'Account',
+          ),
+        ],
+        currentIndex: _calculateSelectedIndex(context),
+        onTap: (int idx) => _onItemTapped(idx, context),
+      ),
     );
   }
 
-  List<Route<dynamic>> _onGenerateInitialRoutes(String initialRoute) {
-    // Implement your logic here to determine initial routes
-    return [
-      MaterialPageRoute(builder: (_) => _getInitialPage()),
-    ];
+  static int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.path;
+    if (location == HomePage.routeName) {
+      return 0;
+    }
+    if (location == HistoryPage.routeName) {
+      return 1;
+    }
+    if (location == NotificationsPage.routeName) {
+      return 2;
+    }
+    if (location == AccountPage.routeName) {
+      return 3;
+    }
+    return 0;
   }
 
-  Widget _getInitialPage() {
-    // Implement logic to determine initial page based on tokens
-    return FutureBuilder<Map<String, String>>(
-      future: _storage.readAll(), // Fetch all stored values (tokens)
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // const CircularProgressIndicator(); // Show loading indicator while fetching tokens
-          return const Scaffold(
-              body: Center(
-            child: CircularProgressIndicator(),
-          ));
-        }
-        if (snapshot.hasError) {
-          return Scaffold(
-              body: Text(
-                  'Error: ${snapshot.error}')); // Handle error if fetching fails
-        }
-        final tokens = snapshot.data;
-        if (tokens != null &&
-            tokens.containsKey('accessToken') &&
-            tokens.containsKey('refreshToken')) {
-          // Tokens are available, navigate to Home page
-          // return const HomePage(); // Replace with logic based on tokens if needed
-          // debugPrint("[ TOKENS AVAILABLE ]");
-          return const MainLoaderPage();
-        } else {
-          // Tokens are not available or invalid, navigate to Login page
-          return const LoginPage(); // Replace with logic based on tokens if needed
-        }
-      },
+  void _onItemTapped(int index, BuildContext context) {
+    switch (index) {
+      case 0:
+        GoRouter.of(context).go(HomePage.routeName);
+      case 1:
+        GoRouter.of(context).go(HistoryPage.routeName);
+      case 2:
+        GoRouter.of(context).go(NotificationsPage.routeName);
+
+      case 3:
+        GoRouter.of(context).go(AccountPage.routeName);
+    }
+  }
+}
+
+class ScaffoldSellerNavBar extends StatelessWidget {
+  const ScaffoldSellerNavBar({
+    required this.child,
+    super.key,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: child,
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: 'Calendar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_outlined),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu),
+            label: 'Menu',
+          ),
+        ],
+        currentIndex: _calculateSelectedIndex(context),
+        onTap: (int idx) => _onItemTapped(idx, context),
+      ),
     );
+  }
+
+  static int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.path;
+    if (location == SellerHomePage.routeName) {
+      return 0;
+    }
+    if (location == SellerCalendarPage.routeName) {
+      return 1;
+    }
+    if (location == SellerNotificationPage.routeName) {
+      return 2;
+    }
+    if (location == SellerMenuPage.routeName) {
+      return 3;
+    }
+    return 0;
+  }
+
+  void _onItemTapped(int index, BuildContext context) {
+    switch (index) {
+      case 0:
+        GoRouter.of(context).go(SellerHomePage.routeName);
+      case 1:
+        GoRouter.of(context).go(SellerCalendarPage.routeName);
+      case 2:
+        GoRouter.of(context).go(SellerNotificationPage.routeName);
+
+      case 3:
+        GoRouter.of(context).go(SellerMenuPage.routeName);
+    }
   }
 }

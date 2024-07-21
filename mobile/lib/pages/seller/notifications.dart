@@ -31,10 +31,6 @@ class SellerNotificationPage extends HookWidget {
             child: Text("Messages"),
           ),
         ]),
-        bottomNavigationBar: const BottomAppBar(
-            child: SellerBottomNavbarItems(
-          currentTab: routeName,
-        )),
       ),
     );
   }

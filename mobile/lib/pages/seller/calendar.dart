@@ -13,10 +13,6 @@ class SellerCalendarPage extends HookWidget {
         automaticallyImplyLeading: false,
         title: const Text("Your Reservations"),
       ),
-      bottomNavigationBar: const BottomAppBar(
-          child: SellerBottomNavbarItems(
-        currentTab: routeName,
-      )),
     );
   }
 }

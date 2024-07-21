@@ -11,31 +11,25 @@ class NotificationsPage extends StatelessWidget {
       initialIndex: 0,
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          bottom: const TabBar(tabs: <Widget>[
-            Tab(
-              text: "Notifications",
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            bottom: const TabBar(tabs: <Widget>[
+              Tab(
+                text: "Notifications",
+              ),
+              Tab(
+                text: "Messages",
+              ),
+            ]),
+          ),
+          body: const TabBarView(children: <Widget>[
+            Center(
+              child: Text("Notifcations"),
             ),
-            Tab(
-              text: "Messages",
+            Center(
+              child: Text("Messages"),
             ),
-          ]),
-        ),
-        body: const TabBarView(children: <Widget>[
-          Center(
-            child: Text("Notifcations"),
-          ),
-          Center(
-            child: Text("Messages"),
-          ),
-        ]),
-        bottomNavigationBar: const BottomAppBar(
-          child: ClientBottomNavbarItems(
-            currentTab: routeName,
-          ),
-        ),
-      ),
+          ])),
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:acruda/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -7,13 +6,11 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Text("Hello History"),
-      bottomNavigationBar: BottomAppBar(
-        child: ClientBottomNavbarItems(
-          currentTab: routeName,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
       ),
+      body: const Text("Hello History"),
     );
   }
 }

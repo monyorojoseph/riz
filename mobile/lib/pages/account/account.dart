@@ -9,7 +9,6 @@ import 'package:acruda/pages/account/usersettings.dart';
 import 'package:acruda/pages/account/verification.dart';
 import 'package:acruda/services/user.dart';
 import 'package:acruda/widgets/auth/logout.dart';
-import 'package:acruda/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -18,16 +17,13 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const BottomAppBar(
-        child: ClientBottomNavbarItems(
-          currentTab: routeName,
-        ),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
       ),
       body: Container(
           color: Colors.white,
           child: ListView(
             children: <Widget>[
-              const SizedBox(height: 100),
               UserDetails(),
               const SizedBox(height: 40),
               TextButton(

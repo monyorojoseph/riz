@@ -33,10 +33,6 @@ class SellerHomePage extends HookWidget {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ),
-      bottomNavigationBar: const BottomAppBar(
-          child: SellerBottomNavbarItems(
-        currentTab: routeName,
-      )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, CreateVehiclePage.routeName,

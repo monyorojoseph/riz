@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:acruda/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class HomePage extends HookWidget {
   const HomePage({super.key});
-  static const routeName = '/';
+  static const routeName = '/home';
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +24,6 @@ class HomePage extends HookWidget {
               style: TextStyle(color: Colors.black),
             )
           ],
-        ),
-      ),
-      bottomNavigationBar: const BottomAppBar(
-        child: ClientBottomNavbarItems(
-          currentTab: routeName,
         ),
       ),
     );

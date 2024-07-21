@@ -1,12 +1,16 @@
+import 'package:acruda/pages/home/home.dart';
+import 'package:acruda/pages/notifications/notifications.dart';
+import 'package:acruda/pages/seller/home.dart';
+import 'package:acruda/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:acruda/classes/auth.dart';
 import 'package:acruda/classes/pageargs/authverification.dart';
-import 'package:acruda/pages/loaders/mainpage.dart';
 import 'package:acruda/services/auth.dart';
 import 'package:acruda/utils/storage.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthVerificationPage extends StatelessWidget {
   const AuthVerificationPage({super.key});
@@ -88,9 +92,15 @@ class AuthVerificationForm extends HookWidget {
                         //     await _storage.readAll();
                         // debugPrint(allValues.toString());
 
+                        final usersetting = await getUserSettingDetails();
                         if (context.mounted) {
-                          Navigator.pushNamed(
-                              context, MainLoaderPage.routeName);
+                          if (usersetting.currentScreen == "CSCRN") {
+                            GoRouter.of(context).go(HomePage.routeName);
+                          }
+                          if (usersetting.currentScreen == "SSCRN") {
+                            GoRouter.of(context).go(SellerHomePage.routeName);
+                          }
+                          GoRouter.of(context).go(HomePage.routeName);
                         }
                       }
                     } catch (e) {

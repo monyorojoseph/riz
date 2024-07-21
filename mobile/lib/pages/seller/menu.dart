@@ -10,11 +10,6 @@ class SellerMenuPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const BottomAppBar(
-        child: SellerBottomNavbarItems(
-          currentTab: routeName,
-        ),
-      ),
       body: Container(
           color: Colors.white,
           child: ListView(
