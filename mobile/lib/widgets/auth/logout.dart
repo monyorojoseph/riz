@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
 import 'package:acruda/pages/auth/login.dart';
 import 'package:acruda/services/auth.dart';
@@ -43,7 +44,7 @@ class Logout extends StatelessWidget {
                             }
                             await _storage.delete(key: "accessToken");
                             if (context.mounted) {
-                              Navigator.pushNamed(context, LoginPage.routeName);
+                              GoRouter.of(context).go(LoginPage.routeName);
                             }
                           },
                           child: const Text("Logout"),

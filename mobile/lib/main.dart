@@ -1,6 +1,7 @@
 import 'package:acruda/classes/pageargs/authverification.dart';
 import 'package:acruda/classes/pageargs/editvehicle.dart';
 import 'package:acruda/pages/landing/landingpage.dart';
+import 'package:acruda/pages/landing/landingpageloader.dart';
 import 'package:acruda/utils/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,23 +62,37 @@ class MyApp extends StatelessWidget {
 
   final GoRouter _router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: Landingpage.routeName,
+    initialLocation: LandingPageLoader.routeName,
     debugLogDiagnostics: true,
     redirect: (BuildContext context, GoRouterState state) async {
       final storageValues = await _readStorageValues();
-
       if (storageValues.containsKey('accessToken') &&
           storageValues.containsKey('refreshToken')) {
         return state.uri.path;
       } else {
-        return Landingpage.routeName;
+        final routes = [
+          LoginPage.routeName,
+          RegisterPage.routeName,
+          AuthVerificationPage.routeName
+        ];
+        if (routes.contains(state.fullPath)) {
+          return state.fullPath;
+        }
+
+        return LandingPage.routeName;
       }
     },
     routes: <RouteBase>[
       GoRoute(
-        path: Landingpage.routeName,
+        path: LandingPageLoader.routeName,
         builder: (BuildContext context, GoRouterState state) {
-          return const Landingpage();
+          return const LandingPageLoader();
+        },
+      ),
+      GoRoute(
+        path: LandingPage.routeName,
+        builder: (BuildContext context, GoRouterState state) {
+          return const LandingPage();
         },
       ),
 

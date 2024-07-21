@@ -7,6 +7,7 @@ import 'package:acruda/pages/home/home.dart';
 import 'package:acruda/pages/loaders/switchpage.dart';
 import 'package:acruda/pages/notifications/notifications.dart';
 import 'package:acruda/services/user.dart';
+import 'package:go_router/go_router.dart';
 
 class ClientBottomNavbarItems extends HookWidget {
   const ClientBottomNavbarItems({super.key, required this.currentTab});
@@ -65,8 +66,8 @@ class ClientBottomNavbarItems extends HookWidget {
           tooltip: 'switch',
           icon: const Icon(Icons.swap_horiz_outlined, size: 40),
           onPressed: () {
-            Navigator.pushNamed(context, SwitchLoaderPage.routeName,
-                arguments: SwitchLoaderPageArgs('SSCRN'));
+            GoRouter.of(context).go(SwitchLoaderPage.routeName,
+                extra: SwitchLoaderPageArgs('SSCRN'));
           },
         ),
       );

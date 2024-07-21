@@ -26,10 +26,20 @@ class AuthVerificationPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text("Token Auth Verification"),
-              const SizedBox(height: 10),
-              Text(
-                  "${args.fullName} Auth token has been sent to your email, use it to login."),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                    "Verify Code",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text("Please enter the code we just sent to email"),
+                  Text(args.email)
+                ],
+              ),
+              const SizedBox(height: 20),
               AuthVerificationForm(email: args.email),
             ],
           ),
@@ -63,7 +73,22 @@ class AuthVerificationForm extends HookWidget {
                 FormBuilderValidators.required(),
               ]),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text("Didn't receive OTP ?"),
+                TextButton(
+                    onPressed: () {
+                      // GoRouter.of(context).go(RegisterPage.routeName);
+                    },
+                    child: const Text(
+                      "Resend Code",
+                      style: TextStyle(decoration: TextDecoration.underline),
+                    ))
+              ],
+            ),
+            const SizedBox(height: 10),
             MaterialButton(
               minWidth: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(vertical: 7.5),
@@ -115,7 +140,7 @@ class AuthVerificationForm extends HookWidget {
                       color: Colors.white,
                     )
                   : const Text(
-                      'Submit',
+                      'Verify',
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

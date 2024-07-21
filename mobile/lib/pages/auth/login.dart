@@ -1,3 +1,4 @@
+import 'package:acruda/pages/account/verification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,6 +8,7 @@ import 'package:acruda/classes/pageargs/authverification.dart';
 import 'package:acruda/pages/auth/register.dart';
 import 'package:acruda/pages/auth/verification.dart';
 import 'package:acruda/services/auth.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -22,10 +24,19 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Center(
-                child: Text("Login"),
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Login",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 5),
+                  Text("Hi welcome back"),
+                ],
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
               LoginForm()
             ],
           ),
@@ -85,9 +96,8 @@ class LoginForm extends HookWidget {
                     if (user.email.isNotEmpty && user.fullName.isNotEmpty) {
                       if (context.mounted) {
                         debugPrint(user.fullName);
-                        Navigator.pushNamed(
-                            context, AuthVerificationPage.routeName,
-                            arguments: AuthVerificationPageArgs(
+                        GoRouter.of(context).go(AuthVerificationPage.routeName,
+                            extra: AuthVerificationPageArgs(
                                 user.email, user.fullName));
                       }
                     }
@@ -114,17 +124,19 @@ class LoginForm extends HookWidget {
                   ),
           ),
           const SizedBox(height: 20),
-          const Text("or"),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, RegisterPage.routeName);
-            },
-            child: const Text(
-              "Create account ?",
-              style: TextStyle(
-                  decoration: TextDecoration.underline, color: Colors.black54),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text("Don't have an account ?"),
+              TextButton(
+                  onPressed: () {
+                    GoRouter.of(context).go(RegisterPage.routeName);
+                  },
+                  child: const Text(
+                    "Sign Up",
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ))
+            ],
           ),
         ],
       ),

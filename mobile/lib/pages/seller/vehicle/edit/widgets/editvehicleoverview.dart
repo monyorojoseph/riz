@@ -10,6 +10,7 @@ import 'package:acruda/pages/seller/vehicle/edit/editvehicle.dart';
 import 'package:acruda/services/url.dart';
 import 'package:acruda/services/utils.dart';
 import 'package:acruda/services/vehicle.dart';
+import 'package:go_router/go_router.dart';
 
 class EditVehicleOverview extends HookWidget {
   final ValueNotifier<EditSteps> currentPage;
@@ -74,8 +75,8 @@ class EditVehicleOverview extends HookWidget {
             if (passed) {
               currentPage.value = EditSteps.details;
             } else {
-              Navigator.pushNamed(context, CreateVehiclePage.routeName,
-                  arguments: CreateVehiclePageArgs(
+              GoRouter.of(context).go(CreateVehiclePage.routeName,
+                  extra: CreateVehiclePageArgs(
                       vehicle: vehicle, page: CreateSteps.details));
             }
           },
@@ -105,8 +106,8 @@ class EditVehicleOverview extends HookWidget {
             if (passed) {
               currentPage.value = EditSteps.images;
             } else {
-              Navigator.pushNamed(context, CreateVehiclePage.routeName,
-                  arguments: CreateVehiclePageArgs(
+              GoRouter.of(context).go(CreateVehiclePage.routeName,
+                  extra: CreateVehiclePageArgs(
                       vehicle: vehicle, page: CreateSteps.images));
             }
           },

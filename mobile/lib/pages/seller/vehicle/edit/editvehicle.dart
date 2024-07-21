@@ -29,6 +29,7 @@ class EditVehiclePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(args.toString());
     final vehicle =
         useQuery(['${args.id}-vehicle'], () => listedVehicleDetails(args.id));
     final currentPage = useState<EditSteps>(EditSteps.overview);
@@ -43,7 +44,7 @@ class EditVehiclePage extends HookWidget {
         ),
       );
     }
-
+    debugPrint(vehicle.data?.id.toString());
     Widget selectedPage = useMemoized(() {
       switch (currentPage.value) {
         case EditSteps.basic:

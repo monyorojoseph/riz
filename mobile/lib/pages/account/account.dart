@@ -1,4 +1,5 @@
 // import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -28,7 +29,7 @@ class AccountPage extends StatelessWidget {
               const SizedBox(height: 40),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, ProfilePage.routeName);
+                  GoRouter.of(context).go(ProfilePage.routeName);
                 },
                 child: const Row(
                   children: <Widget>[
@@ -49,7 +50,7 @@ class AccountPage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, UserVerificationPage.routeName);
+                  GoRouter.of(context).go(UserVerificationPage.routeName);
                 },
                 child: const Row(
                   children: <Widget>[
@@ -70,7 +71,7 @@ class AccountPage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, UserSettingsPage.routeName);
+                  GoRouter.of(context).go(UserSettingsPage.routeName);
                 },
                 child: const Row(
                   children: <Widget>[
@@ -91,7 +92,7 @@ class AccountPage extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, UserListVehiclePage.routeName);
+                  GoRouter.of(context).go(UserListVehiclePage.routeName);
                 },
                 child: const Row(
                   children: <Widget>[

@@ -228,8 +228,8 @@ class VehicleListing extends HookWidget {
         ),
         child: GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, EditVehiclePage.routeName,
-                arguments: EditVehiclePageArgs(vehicle.id));
+            GoRouter.of(context).go(EditVehiclePage.routeName,
+                extra: EditVehiclePageArgs(vehicle.id));
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

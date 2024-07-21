@@ -7,6 +7,7 @@ import 'package:acruda/classes/pageargs/authverification.dart';
 import 'package:acruda/pages/auth/login.dart';
 import 'package:acruda/pages/auth/verification.dart';
 import 'package:acruda/services/auth.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -14,22 +15,50 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // return Scaffold(
+    //   body: Container(
+    //     color: Colors.white,
+    //     child: Padding(
+    //       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
+    //       child: SingleChildScrollView(
+    //         child: Column(
+    //           mainAxisAlignment: MainAxisAlignment.center,
+    //           children: <Widget>[
+    //             const Center(
+    //               child: Text("Create Account"),
+    //             ),
+    //             const SizedBox(height: 50),
+    //             RegisterForm(),
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // );
+
     return Scaffold(
       body: Container(
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Center(
-                  child: Text("Create Account"),
-                ),
-                const SizedBox(height: 50),
-                RegisterForm(),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Create Account",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 5),
+                  Text("Fill your information below"),
+                ],
+              ),
+              const SizedBox(height: 20),
+              RegisterForm()
+            ],
           ),
         ),
       ),
@@ -75,6 +104,19 @@ class RegisterForm extends HookWidget {
               FormBuilderValidators.required(),
             ]),
           ),
+          Row(
+            children: <Widget>[
+              const Text("Agree with ?"),
+              TextButton(
+                  onPressed: () {
+                    GoRouter.of(context).go(LoginPage.routeName);
+                  },
+                  child: const Text(
+                    "Terms & Conditions",
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ))
+            ],
+          ),
           const SizedBox(height: 30),
           MaterialButton(
             minWidth: MediaQuery.of(context).size.width,
@@ -93,9 +135,8 @@ class RegisterForm extends HookWidget {
                         await registerUser(email, password, fullName);
                     if (user.email.isNotEmpty && user.fullName.isNotEmpty) {
                       if (context.mounted) {
-                        Navigator.pushNamed(
-                            context, AuthVerificationPage.routeName,
-                            arguments: AuthVerificationPageArgs(
+                        GoRouter.of(context).go(AuthVerificationPage.routeName,
+                            extra: AuthVerificationPageArgs(
                                 user.email, user.fullName));
                       }
                     }
@@ -122,17 +163,19 @@ class RegisterForm extends HookWidget {
                   ),
           ),
           const SizedBox(height: 20),
-          const Text("or"),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, LoginPage.routeName);
-            },
-            child: const Text(
-              "login",
-              style: TextStyle(
-                  decoration: TextDecoration.underline, color: Colors.black54),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text("Already have an account ?"),
+              TextButton(
+                  onPressed: () {
+                    GoRouter.of(context).go(LoginPage.routeName);
+                  },
+                  child: const Text(
+                    "Sign In",
+                    style: TextStyle(decoration: TextDecoration.underline),
+                  ))
+            ],
           ),
         ],
       ),
