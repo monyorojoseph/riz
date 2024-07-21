@@ -1,4 +1,5 @@
 // import 'package:file_picker/file_picker.dart';
+import 'package:acruda/widgets/switc/switchcurrentscreen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +112,7 @@ class AccountPage extends StatelessWidget {
                   ],
                 ),
               ),
+              const SwitchCurrentScreen(screenName: "SSCRN"),
               const SizedBox(height: 30),
               Logout()
             ],
@@ -126,53 +128,60 @@ class UserDetails extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final user = useQuery(['userDetails'], getUserDetails);
-    return Column(
-      children: <Widget>[
-        Stack(
-          children: <Widget>[
-            const CircleAvatar(
-              maxRadius: 60,
-              backgroundImage: AssetImage('assets/defaults/user.jpg'),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () async {
-                  // FilePickerResult? result =
-                  //     await FilePicker.platform.pickFiles();
+    return Center(
+      child: Row(
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              const CircleAvatar(
+                maxRadius: 35,
+                backgroundImage: AssetImage('assets/defaults/user.jpg'),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () async {
+                    // FilePickerResult? result =
+                    //     await FilePicker.platform.pickFiles();
 
-                  // Pick an image.
-                  final XFile? image =
-                      await picker.pickImage(source: ImageSource.gallery);
-                },
-                child: const Icon(
-                  Icons.image,
-                  size: 30,
-                  color: Colors.black54,
+                    // Pick an image.
+                    final XFile? image =
+                        await picker.pickImage(source: ImageSource.gallery);
+                  },
+                  child: const Icon(
+                    Icons.image,
+                    size: 30,
+                    color: Colors.black54,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Icon(Icons.verified_outlined),
-            const SizedBox(width: 5),
-            Text(
-              user.data?.fullName ?? "",
-              style: const TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Text(
-          user.data?.joinedOn.toString() ?? "",
-          style: const TextStyle(fontSize: 12),
-        )
-      ],
+            ],
+          ),
+          const SizedBox(width: 30),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(Icons.verified_outlined),
+                  const SizedBox(width: 5),
+                  Text(
+                    user.data?.fullName ?? "",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                "Joined ${user.data?.joinedOn.day}",
+                style: const TextStyle(fontSize: 12),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 }

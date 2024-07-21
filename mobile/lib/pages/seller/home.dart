@@ -117,7 +117,7 @@ class VehicleListing extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final queryClient = useQueryClient();
-    final controller = useAnimationController();
+    // final controller = useAnimationController();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 7.5),

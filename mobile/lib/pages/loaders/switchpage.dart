@@ -5,6 +5,7 @@ import 'package:acruda/classes/user.dart';
 import 'package:acruda/pages/home/home.dart';
 import 'package:acruda/pages/seller/home.dart';
 import 'package:acruda/services/user.dart';
+import 'package:go_router/go_router.dart';
 
 class SwitchLoaderPage extends HookWidget {
   final SwitchLoaderPageArgs args;
@@ -25,33 +26,11 @@ class SwitchLoaderPage extends HookWidget {
 
         if (context.mounted) {
           if (usersetting.currentScreen == "CSCRN") {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (BuildContext context,
-                    Animation<double> animation1,
-                    Animation<double> animation2) {
-                  return const HomePage();
-                },
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            GoRouter.of(context).go(HomePage.routeName);
           }
 
           if (usersetting.currentScreen == "SSCRN") {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (BuildContext context,
-                    Animation<double> animation1,
-                    Animation<double> animation2) {
-                  return const SellerHomePage();
-                },
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            GoRouter.of(context).go(SellerHomePage.routeName);
           }
         }
       }

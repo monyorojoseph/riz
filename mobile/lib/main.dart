@@ -3,6 +3,8 @@ import 'package:acruda/classes/pageargs/editvehicle.dart';
 import 'package:acruda/pages/landing/landingpage.dart';
 import 'package:acruda/pages/landing/landingpageloader.dart';
 import 'package:acruda/utils/storage.dart';
+import 'package:acruda/widgets/customscaffolds/clientnavbarscaffold.dart';
+import 'package:acruda/widgets/customscaffolds/sellernavbarscaffold.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,21 +35,24 @@ import 'pages/history/history.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shell');
+final GlobalKey<NavigatorState> _clientshellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'clientshell');
+final GlobalKey<NavigatorState> _sellershellNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'sellershell');
 
-final queryClient = QueryClient(
+final _queryClient = QueryClient(
   defaultQueryOptions: DefaultQueryOptions(),
 );
+
+final _storage = MyCustomSecureStorage();
+
 void main() {
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('google_fonts/UFL.txt');
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
   });
-  runApp(QueryClientProvider(queryClient: queryClient, child: MyApp()));
+  runApp(QueryClientProvider(queryClient: _queryClient, child: MyApp()));
 }
-
-final _storage = MyCustomSecureStorage();
 
 Future<Map<String, String>> _readStorageValues() async {
   try {
@@ -120,7 +125,7 @@ class MyApp extends StatelessWidget {
 
       /// Client Application shell
       ShellRoute(
-        navigatorKey: _shellNavigatorKey,
+        navigatorKey: _clientshellNavigatorKey,
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return ScaffoldClientNavBar(child: child);
         },
@@ -154,7 +159,7 @@ class MyApp extends StatelessWidget {
 
       // Seller Application shell
       ShellRoute(
-        navigatorKey: _shellNavigatorKey,
+        navigatorKey: _sellershellNavigatorKey,
         builder: (BuildContext context, GoRouterState state, Widget child) {
           return ScaffoldSellerNavBar(child: child);
         },
@@ -288,142 +293,5 @@ class MyApp extends StatelessWidget {
       ),
       routerConfig: _router,
     );
-  }
-}
-
-class ScaffoldClientNavBar extends StatelessWidget {
-  const ScaffoldClientNavBar({required this.child, super.key});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle_outlined),
-            label: 'Account',
-          ),
-        ],
-        currentIndex: _calculateSelectedIndex(context),
-        onTap: (int idx) => _onItemTapped(idx, context),
-      ),
-    );
-  }
-
-  static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.path;
-    if (location == HomePage.routeName) {
-      return 0;
-    }
-    if (location == HistoryPage.routeName) {
-      return 1;
-    }
-    if (location == NotificationsPage.routeName) {
-      return 2;
-    }
-    if (location == AccountPage.routeName) {
-      return 3;
-    }
-    return 0;
-  }
-
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        GoRouter.of(context).go(HomePage.routeName);
-      case 1:
-        GoRouter.of(context).go(HistoryPage.routeName);
-      case 2:
-        GoRouter.of(context).go(NotificationsPage.routeName);
-
-      case 3:
-        GoRouter.of(context).go(AccountPage.routeName);
-    }
-  }
-}
-
-class ScaffoldSellerNavBar extends StatelessWidget {
-  const ScaffoldSellerNavBar({
-    required this.child,
-    super.key,
-  });
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu),
-            label: 'Menu',
-          ),
-        ],
-        currentIndex: _calculateSelectedIndex(context),
-        onTap: (int idx) => _onItemTapped(idx, context),
-      ),
-    );
-  }
-
-  static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.path;
-    if (location == SellerHomePage.routeName) {
-      return 0;
-    }
-    if (location == SellerCalendarPage.routeName) {
-      return 1;
-    }
-    if (location == SellerNotificationPage.routeName) {
-      return 2;
-    }
-    if (location == SellerMenuPage.routeName) {
-      return 3;
-    }
-    return 0;
-  }
-
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        GoRouter.of(context).go(SellerHomePage.routeName);
-      case 1:
-        GoRouter.of(context).go(SellerCalendarPage.routeName);
-      case 2:
-        GoRouter.of(context).go(SellerNotificationPage.routeName);
-
-      case 3:
-        GoRouter.of(context).go(SellerMenuPage.routeName);
-    }
   }
 }

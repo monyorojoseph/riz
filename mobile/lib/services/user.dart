@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:acruda/classes/user.dart';
 import 'package:acruda/services/url.dart';
 import 'package:acruda/services/utils.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:acruda/widgets/bottomnavbar/clientbottomnavbaritems.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});

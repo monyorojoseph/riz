@@ -1,6 +1,4 @@
-import 'package:acruda/pages/home/home.dart';
-import 'package:acruda/pages/seller/home.dart';
-import 'package:acruda/services/user.dart';
+import 'package:acruda/pages/landing/landingpageloader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -113,16 +111,8 @@ class AuthVerificationForm extends HookWidget {
                         // Map<String, String> allValues =
                         //     await _storage.readAll();
                         // debugPrint(allValues.toString());
-
-                        final usersetting = await getUserSettingDetails();
                         if (context.mounted) {
-                          if (usersetting.currentScreen == "CSCRN") {
-                            GoRouter.of(context).go(HomePage.routeName);
-                          }
-                          if (usersetting.currentScreen == "SSCRN") {
-                            GoRouter.of(context).go(SellerHomePage.routeName);
-                          }
-                          GoRouter.of(context).go(HomePage.routeName);
+                          GoRouter.of(context).go(LandingPageLoader.routeName);
                         }
                       }
                     } catch (e) {

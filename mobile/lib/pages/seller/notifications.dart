@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:acruda/widgets/bottomnavbar/sellerbottomnavbar.dart';
 
 class SellerNotificationPage extends HookWidget {
   const SellerNotificationPage({super.key});
